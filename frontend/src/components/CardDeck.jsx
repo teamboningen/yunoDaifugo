@@ -1,6 +1,6 @@
 import React from 'react';
 
-function CardDeck({ deckSize, drawCard, isGameOver }) {
+const CardDeck = ({ deckSize, drawCard, isGameOver }) => {
   return (
     <div className="text-center mb-6">
       <p className="text-lg">Deck Size: <strong>{deckSize}</strong></p>
@@ -13,6 +13,6 @@ function CardDeck({ deckSize, drawCard, isGameOver }) {
       </button>
     </div>
   );
-}
+};
 
 export default CardDeck;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-function GameControls({ resetGame }) {
+const GameControls = ({ resetGame }) => {
   return (
     <div className="text-center mt-6">
       <button
@@ -11,6 +11,6 @@ function GameControls({ resetGame }) {
       </button>
     </div>
   );
-}
+};
 
 export default GameControls;

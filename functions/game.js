@@ -1,4 +1,4 @@
-const Deck = require('./deck');
+import Deck from './deck.js';
 
 class Game {
   constructor() {
@@ -7,13 +7,13 @@ class Game {
       { name: 'Player 1', cards: [], score: 0 },
       { name: 'Player 2', cards: [], score: 0 },
     ];
-    this.currentTurn = 0; // 0: Player 1, 1: Player 2
+    this.currentTurn = 0;
     this.isGameOver = false;
   }
 
   initialize() {
     this.deck.initialize();
-    this.players.forEach((player) => {
+    this.players.forEach(player => {
       player.cards = [];
       player.score = 0;
     });
@@ -45,6 +45,22 @@ class Game {
   resetGame() {
     this.initialize();
   }
+
+  loadState(state) {
+    this.players = state.players;
+    this.deck.cards = state.deck;
+    this.currentTurn = state.currentTurn;
+    this.isGameOver = state.isGameOver;
+  }
+
+  toJSON() {
+    return {
+      players: this.players,
+      deck: this.deck.cards,
+      currentTurn: this.currentTurn,
+      isGameOver: this.isGameOver,
+    };
+  }
 }
 
-module.exports = Game;
+export default Game;

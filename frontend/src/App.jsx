@@ -1,59 +1,54 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
-import PlayerView from './components/PlayerView';
-import CardDeck from './components/CardDeck';
-import GameControls from './components/GameControls';
+import PlayerView from './components/PlayerView.jsx';
+import CardDeck from './components/CardDeck.jsx';
+import GameControls from './components/GameControls.jsx';
 
-// Socket.IOクライアントを初期化
-const socket = io('http://localhost:3000'); // デプロイ時にはNetlifyのURLに変更
+const socket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000');
 
-function App() {
-  const [players, setPlayers] = useState([
-    { name: 'Player 1', cards: [], score: 0 },
-    { name: 'Player 2', cards: [], score: 0 },
-  ]);
-  const [currentTurn, setCurrentTurn] = useState(0); // 現在のターン (0: Player 1, 1: Player 2)
-  const [deckSize, setDeckSize] = useState(52); // 残りのデッキ枚数
+const App = () => {
+  const [players, setPlayers] = useState([]);
+  const [deckSize, setDeckSize] = useState(0);
+  const [currentTurn, setCurrentTurn] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
 
-  // サーバーからのデータ受信
   useEffect(() => {
-    socket.on('cardDrawn', ({ playerIndex, card, nextTurn, isGameOver, deckSize }) => {
-      setPlayers((prevPlayers) => {
-        const updatedPlayers = [...prevPlayers];
-        updatedPlayers[playerIndex].cards.push(card);
-        updatedPlayers[playerIndex].score += card.value; // カードのスコアを追加
-        return updatedPlayers;
-      });
-      setCurrentTurn(nextTurn);
-      setIsGameOver(isGameOver);
-      setDeckSize(deckSize);
+    socket.emit('loadGame');
+
+    socket.on('gameLoaded', (data) => {
+      setPlayers(data.players);
+      setDeckSize(data.deck.length);
+      setCurrentTurn(data.currentTurn);
+      setIsGameOver(data.isGameOver);
     });
 
-    socket.on('gameReset', () => {
-      setPlayers([
-        { name: 'Player 1', cards: [], score: 0 },
-        { name: 'Player 2', cards: [], score: 0 },
-      ]);
-      setCurrentTurn(0);
-      setDeckSize(52);
-      setIsGameOver(false);
+    socket.on('cardDrawn', (data) => {
+      setPlayers(data.players);
+      setDeckSize(data.deckSize);
+      setCurrentTurn(data.nextTurn);
+      setIsGameOver(data.isGameOver);
+    });
+
+    socket.on('gameReset', (data) => {
+      setPlayers(data.players);
+      setDeckSize(data.deck.length);
+      setCurrentTurn(data.currentTurn);
+      setIsGameOver(data.isGameOver);
     });
 
     return () => {
+      socket.off('gameLoaded');
       socket.off('cardDrawn');
       socket.off('gameReset');
     };
   }, []);
 
-  // カードを引くアクション
   const drawCard = () => {
     if (!isGameOver) {
       socket.emit('drawCard', { playerIndex: currentTurn });
     }
   };
 
-  // ゲームのリセット
   const resetGame = () => {
     socket.emit('resetGame');
   };
@@ -66,7 +61,7 @@ function App() {
         {isGameOver ? (
           <strong className="text-red-600">Game Over! Click Reset to play again.</strong>
         ) : (
-          <span>Current Turn: <strong>{players[currentTurn].name}</strong></span>
+          <span>Current Turn: <strong>{players[currentTurn]?.name}</strong></span>
         )}
       </div>
 
@@ -86,6 +81,6 @@ function App() {
       <GameControls resetGame={resetGame} />
     </div>
   );
-}
+};
 
 export default App;
