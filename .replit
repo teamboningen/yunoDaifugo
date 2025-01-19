@@ -1,5 +1,5 @@
 run = "cd frontend && npm run dev"
-modules = ["nodejs-20"]
+modules = ["nodejs-20", "web", "nix"]
 hidden = [".config", "package-lock.json"]
 
 [gitHubImport]
