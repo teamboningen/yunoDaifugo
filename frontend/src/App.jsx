@@ -11,6 +11,7 @@ const App = () => {
   const [deckSize, setDeckSize] = useState(0);
   const [currentTurn, setCurrentTurn] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [winner, setWinner] = useState(null); // 勝者を管理
 
   useEffect(() => {
     socket.emit('loadGame');
@@ -20,6 +21,7 @@ const App = () => {
       setDeckSize(data.deck.length);
       setCurrentTurn(data.currentTurn);
       setIsGameOver(data.isGameOver);
+      setWinner(data.winner || null);
     });
 
     socket.on('cardDrawn', (data) => {
@@ -27,6 +29,7 @@ const App = () => {
       setDeckSize(data.deckSize);
       setCurrentTurn(data.nextTurn);
       setIsGameOver(data.isGameOver);
+      setWinner(data.winner); // 勝者を更新
     });
 
     socket.on('gameReset', (data) => {
@@ -34,6 +37,7 @@ const App = () => {
       setDeckSize(data.deck.length);
       setCurrentTurn(data.currentTurn);
       setIsGameOver(data.isGameOver);
+      setWinner(null); // 勝者をリセット
     });
 
     return () => {
@@ -59,7 +63,10 @@ const App = () => {
 
       <div className="text-center text-blue-600 mb-4">
         {isGameOver ? (
-          <strong className="text-red-600">Game Over! Click Reset to play again.</strong>
+          <>
+            <strong className="text-red-600">Game Over! Click Reset to play again.</strong>
+            {winner && <p className="text-green-600 font-bold">Winner: {winner}</p>}
+          </>
         ) : (
           <span>Current Turn: <strong>{players[currentTurn]?.name}</strong></span>
         )}
@@ -69,12 +76,7 @@ const App = () => {
 
       <div className="grid grid-cols-2 gap-4 mt-6">
         {players.map((player, index) => (
-          <PlayerView
-            key={index}
-            playerName={player.name}
-            cards={player.cards}
-            score={player.score}
-          />
+          <PlayerView key={index} playerName={player.name} cards={player.cards} score={player.score} />
         ))}
       </div>
 

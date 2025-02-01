@@ -1,18 +1,21 @@
 import { Server } from 'socket.io';
+import http from 'http';
+import express from 'express';
 import Game from './game.js';
 import { Firestore } from '@google-cloud/firestore';
 
-const firestore = new Firestore();
-const GAME_DOC_ID = 'currentGame'; // Firestoreに保存するドキュメントID
-const io = new Server({ cors: { origin: '*' } });
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: '*' } });
 
-// Firestoreからゲームの状態をロード
+const firestore = new Firestore();
+const GAME_DOC_ID = 'currentGame';
+
 async function loadGameFromFirestore() {
   const gameDoc = await firestore.collection('games').doc(GAME_DOC_ID).get();
   return gameDoc.exists ? gameDoc.data() : null;
 }
 
-// Firestoreにゲームの状態を保存
 async function saveGameToFirestore(gameState) {
   await firestore.collection('games').doc(GAME_DOC_ID).set(gameState);
 }
@@ -42,11 +45,7 @@ io.on('connection', (socket) => {
     const result = game.drawCard(playerIndex);
     if (result) {
       await saveGameToFirestore(game.toJSON());
-      io.emit('cardDrawn', { 
-        ...result, 
-        players: game.players,
-        winner: game.winner, // 勝者を送信
-      });
+      io.emit('cardDrawn', { ...result, players: game.players, winner: game.winner });
     }
   });
 
@@ -60,4 +59,13 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
   });
+});
+
+app.get('/', (req, res) => {
+  res.send("Koyeb Backend is running...");
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

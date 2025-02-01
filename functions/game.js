@@ -9,6 +9,7 @@ class Game {
     ];
     this.currentTurn = 0;
     this.isGameOver = false;
+    this.winner = null;  // 勝者を記録
   }
 
   initialize() {
@@ -19,6 +20,7 @@ class Game {
     });
     this.currentTurn = 0;
     this.isGameOver = false;
+    this.winner = null;  // 勝者をリセット
   }
 
   drawCard(playerIndex) {
@@ -29,8 +31,20 @@ class Game {
     player.cards.push(card);
     player.score += card.value;
 
+    // ゲーム終了判定
     if (player.cards.length === 5 || this.deck.size === 0) {
       this.isGameOver = true;
+
+      // 勝者を決定
+      let highestScore = -1;
+      let winner = null;
+      this.players.forEach(p => {
+        if (p.score > highestScore) {
+          highestScore = p.score;
+          winner = p.name;
+        }
+      });
+      this.winner = winner;
     }
 
     this.currentTurn = (this.currentTurn + 1) % this.players.length;
@@ -39,6 +53,7 @@ class Game {
       nextTurn: this.currentTurn,
       isGameOver: this.isGameOver,
       deckSize: this.deck.size,
+      winner: this.winner, // 勝者を含める
     };
   }
 
@@ -51,6 +66,7 @@ class Game {
     this.deck.cards = state.deck;
     this.currentTurn = state.currentTurn;
     this.isGameOver = state.isGameOver;
+    this.winner = state.winner; // 勝者の状態も復元
   }
 
   toJSON() {
@@ -59,6 +75,7 @@ class Game {
       deck: this.deck.cards,
       currentTurn: this.currentTurn,
       isGameOver: this.isGameOver,
+      winner: this.winner, // 勝者をJSONに含める
     };
   }
 }
