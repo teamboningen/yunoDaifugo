@@ -4,7 +4,7 @@ import PlayerView from './components/PlayerView.jsx';
 import CardDeck from './components/CardDeck.jsx';
 import GameControls from './components/GameControls.jsx';
 
-const socket = io(import.meta.env.VITE_BACKEND_URL || 'https://yunodaifugo.netlify.app/.netlify/functions/handler');
+const socket = io(import.meta.env.VITE_BACKEND_URL || 'https://sufficient-tiffani-teamboningen-58a55eb3.koyeb.app');
 
 const App = () => {
   const [players, setPlayers] = useState([]);
