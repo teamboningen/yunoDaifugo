@@ -17,11 +17,13 @@ const App = () => {
     socket.emit('loadGame');
 
     socket.on('gameLoaded', (data) => {
-      setPlayers(data.players);
+      console.log('Game Loaded Response:', data.message);
+      
+      /*setPlayers(data.players);
       setDeckSize(data.deck.length);
       setCurrentTurn(data.currentTurn);
       setIsGameOver(data.isGameOver);
-      setWinner(data.winner || null);
+      setWinner(data.winner || null);*/
     });
 
     socket.on('cardDrawn', (data) => {

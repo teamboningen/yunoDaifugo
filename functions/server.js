@@ -24,7 +24,7 @@ io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
   socket.on('loadGame', async () => {
-    const currentGameState = await loadGameFromFirestore();
+    /*const currentGameState = await loadGameFromFirestore();
     if (currentGameState) {
       socket.emit('gameLoaded', currentGameState);
     } else {
@@ -32,8 +32,11 @@ io.on('connection', (socket) => {
       game.initialize();
       await saveGameToFirestore(game.toJSON());
       socket.emit('gameLoaded', game.toJSON());
-    }
-  });
+    }*/
+
+      console.log('loadGame request received');
+      socket.emit('gameLoaded', { message: 'loadGame request received successfully' });
+    });
 
   socket.on('drawCard', async ({ playerIndex }) => {
     const currentGameState = await loadGameFromFirestore();
