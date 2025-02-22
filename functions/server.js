@@ -1,14 +1,17 @@
+console.log('FIREBASE_SERVICE_ACCOUNT:', process.env.FIREBASE_SERVICE_ACCOUNT);
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+console.log('Parsed Firebase Project ID:', serviceAccount.project_id);
+
 import { Server } from 'socket.io';
 import http from 'http';
 import express from 'express';
 import Game from './game.js';
-import { Firestore } from '@google-cloud/firestore';
+import firestore from './firebase.js';
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
-const firestore = new Firestore();
 const GAME_DOC_ID = 'currentGame';
 
 async function loadGameFromFirestore() {
@@ -24,7 +27,7 @@ io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
   socket.on('loadGame', async () => {
-    /*const currentGameState = await loadGameFromFirestore();
+    const currentGameState = await loadGameFromFirestore();
     if (currentGameState) {
       socket.emit('gameLoaded', currentGameState);
     } else {
@@ -32,10 +35,9 @@ io.on('connection', (socket) => {
       game.initialize();
       await saveGameToFirestore(game.toJSON());
       socket.emit('gameLoaded', game.toJSON());
-    }*/
+    }
 
-      console.log('loadGame request received');
-      socket.emit('gameLoaded', { message: 'loadGame request received successfully' });
+    
     });
 
   socket.on('drawCard', async ({ playerIndex }) => {
