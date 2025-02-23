@@ -1,7 +1,3 @@
-console.log('FIREBASE_SERVICE_ACCOUNT:', process.env.FIREBASE_SERVICE_ACCOUNT);
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-console.log('Parsed Firebase Project ID:', serviceAccount.project_id);
-
 import { Server } from 'socket.io';
 import http from 'http';
 import express from 'express';
