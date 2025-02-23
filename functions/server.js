@@ -27,7 +27,6 @@ io.on('connection', (socket) => {
     const currentGameState = await loadGameFromFirestore();
     console.log('Loaded Game State:', currentGameState);
     
-    const currentGameState = await loadGameFromFirestore();
     if (currentGameState) {
       socket.emit('gameLoaded', currentGameState);
     } else {
