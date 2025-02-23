@@ -23,6 +23,10 @@ io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
   socket.on('loadGame', async () => {
+    console.log('Attempting to load game from Firestore...');
+    const currentGameState = await loadGameFromFirestore();
+    console.log('Loaded Game State:', currentGameState);
+    
     const currentGameState = await loadGameFromFirestore();
     if (currentGameState) {
       socket.emit('gameLoaded', currentGameState);
