@@ -14,10 +14,19 @@ const App = () => {
   const [isGameOver, setIsGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
   const [announcement, setAnnouncement] = useState('ゲームを開始します！');
+  const [isFull, setIsFull] = useState(false); // 満員フラグ追加
 
   useEffect(() => {
+    // 満員時の処理
+    socket.on("gameFull", () => {
+      console.warn("🚫 Game is full. You cannot join.");
+      setIsFull(true);
+    });
+
+    // ゲーム参加リクエストを送信
     socket.emit('joinGame');
 
+    // サーバーからゲーム状態を受信
     socket.on('gameLoaded', (data) => {
       setPlayers(data.players);
       setDeckSize(data.deck.length);
@@ -56,6 +65,7 @@ const App = () => {
     });
 
     return () => {
+      socket.off("gameFull");
       socket.off('gameLoaded');
       socket.off('playerLeft');
       socket.off('cardDrawn');
@@ -76,23 +86,34 @@ const App = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <AnnouncementBar message={announcement} />
-      <main className="flex flex-col flex-grow justify-between items-center">
-        {opponent && (
-          <div className="w-full flex justify-center my-4">
-            <PlayerView
-              playerName={opponent.name}
-              cards={Array(opponent.hand.length).fill({ rank: '?', suit: 'back' })}
-              isOpponent
-            />
-          </div>
-        )}
 
-        <CardDeck drawCard={drawCard} isGameOver={isGameOver} />
+      {isFull ? (
+        // 満員時のメッセージ表示
+        <div className="full-message">
+          ⚠️ ゲームは満員です。他のプレイヤーが退出するのをお待ちください。
+          <button onClick={() => window.location.reload()} className="retry-button">
+            再試行
+          </button>
+        </div>
+      ) : (
+        <main className="flex flex-col flex-grow justify-between items-center">
+          {opponent && (
+            <div className="w-full flex justify-center my-4">
+              <PlayerView
+                playerName={opponent.name}
+                cards={Array(opponent.hand.length).fill({ rank: '?', suit: 'back' })}
+                isOpponent
+              />
+            </div>
+          )}
 
-        <footer className="w-full">
-          <PlayerView playerName={players[0]?.name || 'あなた'} cards={playerHand} />
-        </footer>
-      </main>
+          <CardDeck drawCard={drawCard} isGameOver={isGameOver} />
+
+          <footer className="w-full">
+            <PlayerView playerName={players[0]?.name || 'あなた'} cards={playerHand} />
+          </footer>
+        </main>
+      )}
 
       <GameControls resetGame={() => socket.emit('resetGame')} />
     </div>
