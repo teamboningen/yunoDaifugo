@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { io } from 'socket.io-client';
+import socket from './socket'; // socketを外部からインポート
 import AnnouncementBar from './components/AnnouncementBar';
 import CardDeck from './components/CardDeck';
 import PlayerView from './components/PlayerView';
 import GameControls from './components/GameControls';
-
-const socket = io(import.meta.env.VITE_BACKEND_URL || 'https://sufficient-tiffani-teamboningen-58a55eb3.koyeb.app');
 
 const App = () => {
   const [players, setPlayers] = useState([]);
@@ -17,6 +15,8 @@ const App = () => {
   const [isFull, setIsFull] = useState(false); // 満員フラグ追加
 
   useEffect(() => {
+    socket.connect();
+    
     // 満員時の処理
     socket.on("gameFull", () => {
       console.warn("🚫 Game is full. You cannot join.");
