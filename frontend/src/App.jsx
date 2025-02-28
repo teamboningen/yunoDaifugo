@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
-import PlayerView from './components/PlayerView.jsx';
-import CardDeck from './components/CardDeck.jsx';
-import GameControls from './components/GameControls.jsx';
+import AnnouncementBar from './components/AnnouncementBar';
+import CardDeck from './components/CardDeck';
+import PlayerView from './components/PlayerView';
+import GameControls from './components/GameControls';
 
 const socket = io(import.meta.env.VITE_BACKEND_URL || 'https://sufficient-tiffani-teamboningen-58a55eb3.koyeb.app');
 
@@ -11,19 +12,23 @@ const App = () => {
   const [deckSize, setDeckSize] = useState(0);
   const [currentTurn, setCurrentTurn] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
-  const [winner, setWinner] = useState(null); // 勝者を管理
+  const [winner, setWinner] = useState(null);
+  const [announcement, setAnnouncement] = useState('ゲームを開始します！');
 
   useEffect(() => {
-    socket.emit('loadGame');
+    socket.emit('joinGame');
 
     socket.on('gameLoaded', (data) => {
-      console.log('Game Loaded Response:', data.message);
-      
       setPlayers(data.players);
       setDeckSize(data.deck.length);
       setCurrentTurn(data.currentTurn);
       setIsGameOver(data.isGameOver);
       setWinner(data.winner || null);
+      setAnnouncement(`現在のターン: ${data.players[data.currentTurn]?.name || '不明'}`);
+    });
+
+    socket.on('playerLeft', ({ playerId }) => {
+      setAnnouncement(`プレイヤーが退出しました (${playerId})`);
     });
 
     socket.on('cardDrawn', (data) => {
@@ -31,7 +36,10 @@ const App = () => {
       setDeckSize(data.deckSize);
       setCurrentTurn(data.nextTurn);
       setIsGameOver(data.isGameOver);
-      setWinner(data.winner); // 勝者を更新
+      setWinner(data.winner);
+      setAnnouncement(
+        data.winner ? `${data.winner} が勝利しました！` : `次のターン: ${data.players[data.nextTurn]?.name || '不明'}`
+      );
     });
 
     socket.on('gameReset', (data) => {
@@ -39,50 +47,54 @@ const App = () => {
       setDeckSize(data.deck.length);
       setCurrentTurn(data.currentTurn);
       setIsGameOver(data.isGameOver);
-      setWinner(null); // 勝者をリセット
+      setWinner(null);
+      setAnnouncement('ゲームがリセットされました。');
+    });
+
+    socket.on('error', ({ message }) => {
+      setAnnouncement(`エラー: ${message}`);
     });
 
     return () => {
       socket.off('gameLoaded');
+      socket.off('playerLeft');
       socket.off('cardDrawn');
       socket.off('gameReset');
+      socket.off('error');
     };
   }, []);
 
   const drawCard = () => {
-    if (!isGameOver) {
-      socket.emit('drawCard', { playerIndex: currentTurn });
+    if (deckSize > 0 && !isGameOver) {
+      socket.emit('drawCard');
     }
   };
 
-  const resetGame = () => {
-    socket.emit('resetGame');
-  };
+  const playerHand = players[0]?.hand || [];
+  const opponent = players[1];
 
   return (
-    <div className="App p-4">
-      <h1 className="text-2xl font-bold text-center mb-4">Card Game</h1>
-
-      <div className="text-center text-blue-600 mb-4">
-        {isGameOver ? (
-          <>
-            <strong className="text-red-600">Game Over! Click Reset to play again.</strong>
-            {winner && <p className="text-green-600 font-bold">Winner: {winner}</p>}
-          </>
-        ) : (
-          <span>Current Turn: <strong>{players[currentTurn]?.name}</strong></span>
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      <AnnouncementBar message={announcement} />
+      <main className="flex flex-col flex-grow justify-between items-center">
+        {opponent && (
+          <div className="w-full flex justify-center my-4">
+            <PlayerView
+              playerName={opponent.name}
+              cards={Array(opponent.hand.length).fill({ rank: '?', suit: 'back' })}
+              isOpponent
+            />
+          </div>
         )}
-      </div>
 
-      <CardDeck deckSize={deckSize} drawCard={drawCard} isGameOver={isGameOver} />
+        <CardDeck drawCard={drawCard} isGameOver={isGameOver} />
 
-      <div className="grid grid-cols-2 gap-4 mt-6">
-        {players.map((player, index) => (
-          <PlayerView key={index} playerName={player.name} cards={player.cards} score={player.score} />
-        ))}
-      </div>
+        <footer className="w-full">
+          <PlayerView playerName={players[0]?.name || 'あなた'} cards={playerHand} />
+        </footer>
+      </main>
 
-      <GameControls resetGame={resetGame} />
+      <GameControls resetGame={() => socket.emit('resetGame')} />
     </div>
   );
 };
