@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import socket from './socket'; // socketを外部からインポート
 import AnnouncementBar from './components/AnnouncementBar';
 import CardDeck from './components/CardDeck';
@@ -12,26 +12,41 @@ const App = () => {
   const [isGameOver, setIsGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
   const [announcement, setAnnouncement] = useState('ゲームを開始します！');
-  const [isFull, setIsFull] = useState(false); // 満員フラグ追加
-  const [hasJoined, setHasJoined] = useState(false); // ✅ `useState` で `joinGame` の送信状態を管理
+  const [isFull, setIsFull] = useState(false); // 満員フラグ
+  const [hasJoined, setHasJoined] = useState(false); // `joinGame` の送信管理
+
+  // ログ用の参照
+  const joinCountRef = useRef(0);
+  const prevSocketIdRef = useRef(null);
 
   useEffect(() => {
+    console.log("🚀 useEffect triggered");
+
+    console.log(`🆔 Previous socket ID: ${prevSocketIdRef.current || 'None'}`);
+    console.log(`🆔 Current socket ID: ${socket.id}`);
+
+    if (prevSocketIdRef.current && prevSocketIdRef.current !== socket.id) {
+      console.warn("⚠️ Socket ID has changed! Possible reconnection detected.");
+    }
+    prevSocketIdRef.current = socket.id;
+
     if (!socket.connected) {
-      socket.connect(); // ✅ すでに接続済みなら再接続しない
+      console.log("🔌 Connecting socket...");
+      socket.connect();
     }
 
     if (!hasJoined) {
+      joinCountRef.current += 1;
+      console.log(`📡 Emitting joinGame... (count: ${joinCountRef.current})`);
       socket.emit('joinGame');
-      setHasJoined(true); // ✅ `joinGame` を1回だけ送信するようにする
+      setHasJoined(true);
     }
 
-    // 満員時の処理
     socket.on("gameFull", () => {
       console.warn("🚫 Game is full. You cannot join.");
       setIsFull(true);
     });
 
-    // サーバーからゲーム状態を受信
     socket.on('gameLoaded', (data) => {
       setPlayers(data.players);
       setDeckSize(data.deck.length);
@@ -70,6 +85,7 @@ const App = () => {
     });
 
     return () => {
+      console.log("🔄 Component unmounted or dependencies changed");
       socket.off("gameFull");
       socket.off('gameLoaded');
       socket.off('playerLeft');
@@ -77,7 +93,7 @@ const App = () => {
       socket.off('gameReset');
       socket.off('error');
     };
-  }, [hasJoined]); // ✅ `useEffect` の依存リストに `hasJoined` を追加
+  }, [hasJoined]);
 
   const drawCard = () => {
     if (deckSize > 0 && !isGameOver) {
@@ -93,7 +109,6 @@ const App = () => {
       <AnnouncementBar message={announcement} />
 
       {isFull ? (
-        // 満員時のメッセージ表示
         <div className="full-message">
           ⚠️ ゲームは満員です。他のプレイヤーが退出するのをお待ちください。
           <button onClick={() => window.location.reload()} className="retry-button">
