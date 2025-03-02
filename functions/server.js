@@ -63,8 +63,8 @@ io.on('connection', (socket) => {
       const disconnectedPlayer = game.players.find(p => p.disconnected === true);
       if (disconnectedPlayer) {
         console.log(`🔄 Reconnecting player: ${socket.id}`);
-        disconnectedPlayer.id = socket.id; // ID を更新
-        disconnectedPlayer.disconnected = false; // 切断フラグを解除
+        disconnectedPlayer.id = socket.id;
+        disconnectedPlayer.disconnected = false;
         existingPlayer = disconnectedPlayer;
       }
     }
@@ -82,7 +82,7 @@ io.on('connection', (socket) => {
 
     console.log("👥 Updated players:", game.players);
 
-    const updatedGameState = game.getState();
+    const updatedGameState = game.toJSON();
     console.log("📡 Sending gameLoaded event with state:", updatedGameState);
 
     await saveGameToFirestore(updatedGameState);
@@ -165,3 +165,20 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
+// ✅ Firestore に `currentGame` が存在しない場合、新しいゲームを作成する処理
+async function initializeGameIfNeeded() {
+  console.log("📌 Checking Firestore for existing game...");
+  let gameState = await loadGameFromFirestore();
+  if (!gameState) {
+    console.log("⚠️ No existing game found in Firestore.");
+    console.log("🆕 Creating a new game...");
+    const newGame = new Game();
+    gameState = newGame.toJSON();
+    await saveGameToFirestore(gameState);
+    console.log("✅ New game initialized and saved to Firestore.");
+  } else {
+    console.log("✅ Existing game found in Firestore.");
+  }
+  return gameState;
+}

@@ -4,8 +4,8 @@ class Game {
   constructor() {
     this.deck = new Deck();
     this.players = [
-      { name: 'Player 1', cards: [], score: 0 },
-      { name: 'Player 2', cards: [], score: 0 },
+      { name: 'Player 1', cards: [], score: 0, disconnected: false },
+      { name: 'Player 2', cards: [], score: 0, disconnected: false },
     ];
     this.currentTurn = 0;
     this.isGameOver = false;
