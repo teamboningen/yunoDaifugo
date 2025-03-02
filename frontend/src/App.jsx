@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import socket from './socket'; // socketを外部からインポート
+import socket from './socket';
 import AnnouncementBar from './components/AnnouncementBar';
 import CardDeck from './components/CardDeck';
 import PlayerView from './components/PlayerView';
@@ -12,42 +12,42 @@ const App = () => {
   const [isGameOver, setIsGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
   const [announcement, setAnnouncement] = useState('ゲームを開始します！');
-  const [isFull, setIsFull] = useState(false); // 満員フラグ
-  const [hasJoined, setHasJoined] = useState(false); // `joinGame` の送信管理
-
-  // ログ用の参照
-  const joinCountRef = useRef(0);
-  const prevSocketIdRef = useRef(null);
+  const [isFull, setIsFull] = useState(false);
+  const hasJoinedRef = useRef(false);
 
   useEffect(() => {
     console.log("🚀 useEffect triggered");
 
-    console.log(`🆔 Previous socket ID: ${prevSocketIdRef.current || 'None'}`);
-    console.log(`🆔 Current socket ID: ${socket.id}`);
-
-    if (prevSocketIdRef.current && prevSocketIdRef.current !== socket.id) {
-      console.warn("⚠️ Socket ID has changed! Possible reconnection detected.");
-    }
-    prevSocketIdRef.current = socket.id;
-
     if (!socket.connected) {
-      console.log("🔌 Connecting socket...");
+      console.log("🔌 Calling socket.connect()...");
       socket.connect();
+    } else {
+      console.log(`🆔 Already connected. Socket ID: ${socket.id}`);
     }
 
-    if (!hasJoined) {
-      joinCountRef.current += 1;
-      console.log(`📡 Emitting joinGame... (count: ${joinCountRef.current})`);
-      socket.emit('joinGame');
-      setHasJoined(true);
-    }
+    // `connect` イベント発火時にログを出力
+    socket.on("connect", () => {
+      console.log(`✅ Connected! Socket ID: ${socket.id}`);
 
+      if (!hasJoinedRef.current) {
+        console.log(`📡 Emitting joinGame... (socket.id: ${socket.id})`);
+        socket.emit('joinGame');
+        hasJoinedRef.current = true;
+      }
+    });
+
+    socket.on("disconnect", (reason) => {
+      console.warn(`⚠️ Disconnected: ${reason}`);
+    });
+
+    // 既存のイベントリスナーを維持
     socket.on("gameFull", () => {
       console.warn("🚫 Game is full. You cannot join.");
       setIsFull(true);
     });
 
     socket.on('gameLoaded', (data) => {
+      console.log("📩 gameLoaded received", data);
       setPlayers(data.players);
       setDeckSize(data.deck.length);
       setCurrentTurn(data.currentTurn);
@@ -57,10 +57,12 @@ const App = () => {
     });
 
     socket.on('playerLeft', ({ playerId }) => {
+      console.log(`📢 Player ${playerId} left.`);
       setAnnouncement(`プレイヤーが退出しました (${playerId})`);
     });
 
     socket.on('cardDrawn', (data) => {
+      console.log("🎴 cardDrawn received", data);
       setPlayers(data.players);
       setDeckSize(data.deckSize);
       setCurrentTurn(data.nextTurn);
@@ -72,6 +74,7 @@ const App = () => {
     });
 
     socket.on('gameReset', (data) => {
+      console.log("🔄 gameReset received", data);
       setPlayers(data.players);
       setDeckSize(data.deck.length);
       setCurrentTurn(data.currentTurn);
@@ -81,11 +84,14 @@ const App = () => {
     });
 
     socket.on('error', ({ message }) => {
+      console.error(`❌ Error received: ${message}`);
       setAnnouncement(`エラー: ${message}`);
     });
 
     return () => {
       console.log("🔄 Component unmounted or dependencies changed");
+      socket.off("connect");
+      socket.off("disconnect");
       socket.off("gameFull");
       socket.off('gameLoaded');
       socket.off('playerLeft');
@@ -93,10 +99,11 @@ const App = () => {
       socket.off('gameReset');
       socket.off('error');
     };
-  }, [hasJoined]);
+  }, []);
 
   const drawCard = () => {
     if (deckSize > 0 && !isGameOver) {
+      console.log("🃏 Emitting drawCard...");
       socket.emit('drawCard');
     }
   };
