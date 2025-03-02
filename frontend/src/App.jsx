@@ -13,18 +13,23 @@ const App = () => {
   const [winner, setWinner] = useState(null);
   const [announcement, setAnnouncement] = useState('ゲームを開始します！');
   const [isFull, setIsFull] = useState(false); // 満員フラグ追加
+  const [hasJoined, setHasJoined] = useState(false); // ✅ `useState` で `joinGame` の送信状態を管理
 
   useEffect(() => {
-    socket.connect();
-    
+    if (!socket.connected) {
+      socket.connect(); // ✅ すでに接続済みなら再接続しない
+    }
+
+    if (!hasJoined) {
+      socket.emit('joinGame');
+      setHasJoined(true); // ✅ `joinGame` を1回だけ送信するようにする
+    }
+
     // 満員時の処理
     socket.on("gameFull", () => {
       console.warn("🚫 Game is full. You cannot join.");
       setIsFull(true);
     });
-
-    // ゲーム参加リクエストを送信
-    socket.emit('joinGame');
 
     // サーバーからゲーム状態を受信
     socket.on('gameLoaded', (data) => {
@@ -72,7 +77,7 @@ const App = () => {
       socket.off('gameReset');
       socket.off('error');
     };
-  }, []);
+  }, [hasJoined]); // ✅ `useEffect` の依存リストに `hasJoined` を追加
 
   const drawCard = () => {
     if (deckSize > 0 && !isGameOver) {
