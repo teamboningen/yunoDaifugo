@@ -56,13 +56,23 @@ io.on('connection', (socket) => {
 
     console.log("👥 Current players before joining:", game.players);
 
-    const existingPlayer = game.players.find(p => p.id === socket.id);
-    if (existingPlayer) {
-      console.log(`✅ Player ${socket.id} already in game.`);
-    } else {
+    let existingPlayer = game.players.find(p => p.id === socket.id);
+
+    if (!existingPlayer) {
+      // 切断フラグがついているプレイヤーがいる場合、再接続とみなす
+      const disconnectedPlayer = game.players.find(p => p.disconnected === true);
+      if (disconnectedPlayer) {
+        console.log(`🔄 Reconnecting player: ${socket.id}`);
+        disconnectedPlayer.id = socket.id; // ID を更新
+        disconnectedPlayer.disconnected = false; // 切断フラグを解除
+        existingPlayer = disconnectedPlayer;
+      }
+    }
+
+    if (!existingPlayer) {
       if (game.players.length < 2) {
-        console.log(`➕ Adding player: ${socket.id}`);
-        game.players.push({ id: socket.id, hand: [] });
+        console.log(`➕ Adding new player: ${socket.id}`);
+        game.players.push({ id: socket.id, hand: [], disconnected: false });
       } else {
         console.log(`🚫 Game full. Rejecting player: ${socket.id}`);
         socket.emit('gameFull');
@@ -89,12 +99,10 @@ io.on('connection', (socket) => {
     const game = new Game();
     game.loadState(currentGameState);
 
-    console.log("👥 Current players:", game.players);
-
     const playerIndex = game.players.findIndex((player) => player.id === socket.id);
-    if (playerIndex === -1) {
-      console.error("❌ Player not found:", socket.id);
-      socket.emit('error', { message: 'プレイヤーが見つかりません。' });
+    if (playerIndex === -1 || game.players[playerIndex].disconnected) {
+      console.error("❌ Player not found or disconnected:", socket.id);
+      socket.emit('error', { message: 'プレイヤーが見つからないか、切断中です。' });
       return;
     }
 
@@ -143,10 +151,10 @@ io.on('connection', (socket) => {
     const game = new Game();
     game.loadState(currentGameState);
 
-    const playerToRemove = game.players.find((player) => player.id === socket.id);
-    if (playerToRemove) {
-      playerToRemove.id = null;
-      console.log(`❌ Player removed: ${socket.id}`);
+    const playerToUpdate = game.players.find((player) => player.id === socket.id);
+    if (playerToUpdate) {
+      playerToUpdate.disconnected = true;  // ❗ 切断フラグを設定
+      console.log(`❌ Player flagged as disconnected: ${socket.id}`);
       await saveGameToFirestore(game.toJSON());
       io.emit('playerLeft', { playerId: socket.id });
     }
