@@ -8,7 +8,7 @@ const CardDeck = ({ drawCard, isGameOver }) => {
         <img
           src={cardBackImage}
           alt="Deck"
-          className="w-24 h-32 object-cover rounded shadow-lg hover:scale-105 transition-transform"
+          className="w-5 h-7 object-cover rounded shadow hover:scale-105 transition-transform"
         />
       </button>
     </div>
