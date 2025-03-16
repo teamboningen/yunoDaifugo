@@ -4,23 +4,24 @@ class Game {
   constructor() {
     this.deck = new Deck();
     this.players = [
-      { name: 'Player 1', cards: [], score: 0, disconnected: false },
-      { name: 'Player 2', cards: [], score: 0, disconnected: false },
+      { id: null, name: 'Player 1', cards: [], score: 0 },
+      { id: null, name: 'Player 2', cards: [], score: 0 }
     ];
     this.currentTurn = 0;
     this.isGameOver = false;
-    this.winner = null;  // 勝者を記録
+    this.winner = null;
   }
 
   initialize() {
     this.deck.initialize();
     this.players.forEach(player => {
+      player.id = null;  // 🔹 `id: null` を維持
       player.cards = [];
       player.score = 0;
     });
     this.currentTurn = 0;
     this.isGameOver = false;
-    this.winner = null;  // 勝者をリセット
+    this.winner = null;
   }
 
   drawCard(playerIndex) {
@@ -31,11 +32,8 @@ class Game {
     player.cards.push(card);
     player.score += card.value;
 
-    // ゲーム終了判定
     if (player.cards.length === 5 || this.deck.size === 0) {
       this.isGameOver = true;
-
-      // 勝者を決定
       let highestScore = -1;
       let winner = null;
       this.players.forEach(p => {
@@ -53,7 +51,7 @@ class Game {
       nextTurn: this.currentTurn,
       isGameOver: this.isGameOver,
       deckSize: this.deck.size,
-      winner: this.winner, // 勝者を含める
+      winner: this.winner,
     };
   }
 
@@ -62,20 +60,30 @@ class Game {
   }
 
   loadState(state) {
-    this.players = state.players;
+    this.players = state.players.map(player => ({
+      id: player.id || null,  // 🔹 `id: null` を維持
+      name: player.name,
+      cards: player.cards,
+      score: player.score
+    }));
     this.deck.cards = state.deck;
     this.currentTurn = state.currentTurn;
     this.isGameOver = state.isGameOver;
-    this.winner = state.winner; // 勝者の状態も復元
+    this.winner = state.winner;
   }
 
   toJSON() {
     return {
-      players: this.players,
+      players: this.players.map(player => ({
+        id: player.id || null,  // 🔹 `id: null` を Firestore に保存
+        name: player.name,
+        cards: player.cards,
+        score: player.score
+      })),
       deck: this.deck.cards,
       currentTurn: this.currentTurn,
       isGameOver: this.isGameOver,
-      winner: this.winner, // 勝者をJSONに含める
+      winner: this.winner,
     };
   }
 }
