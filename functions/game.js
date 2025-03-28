@@ -75,21 +75,12 @@ class Game {
 
   toJSON() {
     return {
-      players: this.players.map(player => {
-        if (player.id === socket.id) {
-          return {
-            name: player.name,
-            seatIndex: player.seatIndex,
-            hand: player.cards
-          };
-        } else {
-          return {
-            name: player.name,
-            seatIndex: player.seatIndex,
-            handSize: player.cards.length
-          };
-        }
-      }),
+      players: this.players.map(player => ({
+        id: player.id,
+        name: player.name,
+        seatIndex: player.seatIndex,
+        cards: player.cards
+      })),
       deck: this.deck.cards,
       currentTurn: this.currentTurn,
       isGameOver: this.isGameOver,

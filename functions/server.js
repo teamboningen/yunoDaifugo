@@ -5,6 +5,29 @@ import Game from './game.js';
 import firestore from './firebase.js';
 
 const app = express();
+
+// ゲーム状態をプレイヤーごとに整形するユーティリティ
+function formatGameStateForPlayer(gameState, socketId) {
+  return {
+    ...gameState,
+    players: gameState.players.map(player => {
+      if (player.id === socketId) {
+        return {
+          name: player.name,
+          seatIndex: player.seatIndex,
+          hand: player.cards
+        };
+      } else {
+        return {
+          name: player.name,
+          seatIndex: player.seatIndex,
+          handSize: player.cards.length
+        };
+      }
+    })
+  };
+}
+
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
@@ -143,7 +166,10 @@ io.on('connection', (socket) => {
     if (result) {
       console.log("✅ Card drawn successfully.");
       await saveGameToFirestore(game.toJSON());
-      io.emit('cardDrawn', game.toJSON());
+      const gameState = game.toJSON();
+      game.players.forEach(player => {
+        io.to(player.id).emit('cardDrawn', formatGameStateForPlayer(gameState, player.id));
+      });
     } else {
       console.error("❌ Card draw failed.");
       socket.emit('error', { message: 'カードが引けませんでした。' });
@@ -164,7 +190,10 @@ io.on('connection', (socket) => {
     game.initialize();
 
     await saveGameToFirestore(game.toJSON());
-    io.emit('gameReset', game.toJSON());
+    const gameState = game.toJSON();
+    game.players.forEach(player => {
+      io.to(player.id).emit('gameReset', formatGameStateForPlayer(gameState, player.id));
+    });
     console.log('✅ Game has been reset.');
   });
 
