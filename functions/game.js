@@ -4,8 +4,8 @@ class Game {
   constructor() {
     this.deck = new Deck();
     this.players = [
-      { id: null, name: 'Player 1', cards: [], score: 0 },
-      { id: null, name: 'Player 2', cards: [], score: 0 }
+      { id: null, name: 'Player 1', cards: [], score: 0, seatIndex: 0 },
+      { id: null, name: 'Player 2', cards: [], score: 0, seatIndex: 1 }
     ];
     this.currentTurn = 0;
     this.isGameOver = false;
@@ -15,7 +15,7 @@ class Game {
   initialize() {
     this.deck.initialize();
     this.players.forEach(player => {
-      player.id = null;  // 🔹 `id: null` を維持
+      player.id = null;
       player.cards = [];
       player.score = 0;
     });
@@ -61,10 +61,11 @@ class Game {
 
   loadState(state) {
     this.players = state.players.map(player => ({
-      id: player.id || null,  // 🔹 `id: null` を維持
+      id: player.id || null,
       name: player.name,
       cards: player.cards,
-      score: player.score
+      score: player.score,
+      seatIndex: player.seatIndex
     }));
     this.deck.cards = state.deck;
     this.currentTurn = state.currentTurn;
@@ -74,12 +75,21 @@ class Game {
 
   toJSON() {
     return {
-      players: this.players.map(player => ({
-        id: player.id || null,  // 🔹 `id: null` を Firestore に保存
-        name: player.name,
-        cards: player.cards,
-        score: player.score
-      })),
+      players: this.players.map(player => {
+        if (player.id === socket.id) {
+          return {
+            name: player.name,
+            seatIndex: player.seatIndex,
+            hand: player.cards
+          };
+        } else {
+          return {
+            name: player.name,
+            seatIndex: player.seatIndex,
+            handSize: player.cards.length
+          };
+        }
+      }),
       deck: this.deck.cards,
       currentTurn: this.currentTurn,
       isGameOver: this.isGameOver,

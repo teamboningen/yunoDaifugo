@@ -25,10 +25,8 @@ const App = () => {
       console.log(`🆔 Already connected. Socket ID: ${socket.id}`);
     }
 
-    // `connect` イベント発火時にログを出力
     socket.on("connect", () => {
       console.log(`✅ Connected! Socket ID: ${socket.id}`);
-
       if (!hasJoinedRef.current) {
         console.log(`📡 Emitting joinGame... (socket.id: ${socket.id})`);
         socket.emit('joinGame');
@@ -40,7 +38,6 @@ const App = () => {
       console.warn(`⚠️ Disconnected: ${reason}`);
     });
 
-    // 既存のイベントリスナーを維持
     socket.on("gameFull", () => {
       console.warn("🚫 Game is full. You cannot join.");
       setIsFull(true);
@@ -108,8 +105,8 @@ const App = () => {
     }
   };
 
-  const playerHand = players[0]?.hand || [];
-  const opponent = players[1];
+  const selfPlayer = players.find((p) => !!p.hand);
+  const otherPlayers = players.filter((p) => !p.hand).sort((a, b) => a.seatIndex - b.seatIndex);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -124,21 +121,27 @@ const App = () => {
         </div>
       ) : (
         <main className="flex flex-col flex-grow justify-between items-center">
-          {opponent && (
-            <div className="w-full flex justify-center my-4">
+          {otherPlayers.map((player) => (
+            <div key={player.seatIndex} className="w-full flex justify-center my-4">
               <PlayerView
-                playerName={opponent.name}
-                cards={Array(opponent.hand.length).fill({ rank: '?', suit: 'back' })}
+                playerName={player.name}
+                cards={Array(player.handSize ?? 0).fill({ rank: '?', suit: 'back' })}
                 isOpponent
               />
             </div>
-          )}
+          ))}
 
           <CardDeck drawCard={drawCard} isGameOver={isGameOver} />
 
-          <footer className="w-full">
-            <PlayerView playerName={players[0]?.name || 'あなた'} cards={playerHand} />
-          </footer>
+          {selfPlayer && (
+            <footer className="w-full">
+              <PlayerView
+                key={selfPlayer.seatIndex}
+                playerName={selfPlayer.name || 'あなた'}
+                cards={selfPlayer.hand}
+              />
+            </footer>
+          )}
         </main>
       )}
 
