@@ -1,16 +1,29 @@
 import React from 'react';
-import cardBackImage from '../assets/card-back.jpeg';
 
-const CardDeck = ({ drawCard, isGameOver }) => {
+const CardDeck = ({ drawCard, isGameOver, isDrawable }) => {
+  const handleClick = () => {
+    if (!isGameOver && isDrawable) {
+      drawCard();
+    }
+  };
+
   return (
-    <div className="flex justify-center items-center my-4">
-      <button onClick={drawCard} disabled={isGameOver} className="focus:outline-none">
-        <img
-          src={cardBackImage}
-          alt="Deck"
-          className="w-5 h-7 object-cover rounded shadow hover:scale-105 transition-transform"
-        />
-      </button>
+    <div className="my-6 cursor-pointer">
+      <svg
+        width="100"
+        height="140"
+        viewBox="0 0 100 140"
+        onClick={handleClick}
+        className={`transition-opacity duration-300 mx-auto drop-shadow-md ${
+          isDrawable ? 'opacity-100' : 'opacity-50 pointer-events-none'
+        }`}
+        style={{ cursor: isDrawable ? 'pointer' : 'default' }}
+      >
+        <rect width="100" height="140" rx="10" fill="#2d3748" stroke="#718096" strokeWidth="3" />
+        <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="#cbd5e0" fontSize="20">
+          DECK
+        </text>
+      </svg>
     </div>
   );
 };

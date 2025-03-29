@@ -60,7 +60,7 @@ async function saveGameToFirestore(gameState) {
 }
 
 async function initializeGameIfNeeded() {
-  console.log("📌 Checking Firestore for existing game...");
+  console.log("🔄 Checking Firestore for existing game...");
   let gameState = await loadGameFromFirestore();
 
   if (!gameState) {
@@ -78,11 +78,10 @@ async function initializeGameIfNeeded() {
   return gameState;
 }
 
-// ✅ Express サーバー起動前の初期処理（ベストプラクティス）
 async function main() {
   try {
     console.log("🔄 Initializing game state before starting the server...");
-    await initializeGameIfNeeded();  // Firestore のデータを初期化
+    await initializeGameIfNeeded();
     console.log("🟢 Game initialization complete. Starting the server...");
 
     const PORT = process.env.PORT || 3000;
@@ -92,11 +91,10 @@ async function main() {
 
   } catch (error) {
     console.error("❌ Server initialization failed:", error);
-    process.exit(1);  // 失敗した場合はプロセスを終了
+    process.exit(1);
   }
 }
 
-// ✅ `main()` を呼び出して、初期化後にサーバーを起動
 main();
 
 io.on('connection', (socket) => {
@@ -165,10 +163,13 @@ io.on('connection', (socket) => {
 
     if (result) {
       console.log("✅ Card drawn successfully.");
-      await saveGameToFirestore(game.toJSON());
       const gameState = game.toJSON();
+      await saveGameToFirestore(gameState);
+
+      io.emit('cardDrawnNotice', { seatIndex: playerIndex });
+
       game.players.forEach(player => {
-        io.to(player.id).emit('cardDrawn', formatGameStateForPlayer(gameState, player.id));
+        io.to(player.id).emit('gameUpdated', formatGameStateForPlayer(gameState, player.id));
       });
     } else {
       console.error("❌ Card draw failed.");
@@ -211,7 +212,7 @@ io.on('connection', (socket) => {
       console.log(`🔄 Resetting player slot for ${socket.id}`);
       playerToUpdate.id = null;
       await saveGameToFirestore(game.toJSON());
-      io.emit('playerLeft', { playerId: socket.id });
+      io.emit('playerLeft', { seatIndex: playerToUpdate.seatIndex });
     }
   });
 });

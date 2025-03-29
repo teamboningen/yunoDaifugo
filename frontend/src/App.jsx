@@ -58,6 +58,12 @@ const App = () => {
       setAnnouncement(`プレイヤーが退出しました (${playerId})`);
     });
 
+    socket.on('cardDrawnNotice', ({ seatIndex }) => {
+      console.log(`カードを引いたプレイヤー: seatIndex=${seatIndex}`);
+      const next = players.find(p => p.seatIndex === currentTurn);
+      setAnnouncement(`次のターン: ${next?.name || '不明'}`);
+    });
+
     socket.on('cardDrawn', (data) => {
       console.log("🎴 cardDrawn received", data);
       setPlayers(data.players);
@@ -106,6 +112,7 @@ const App = () => {
   };
 
   const selfPlayer = players.find((p) => !!p.hand);
+  const isDrawable = selfPlayer?.seatIndex === currentTurn;
   const otherPlayers = players.filter((p) => !p.hand).sort((a, b) => a.seatIndex - b.seatIndex);
 
   return (
@@ -131,7 +138,7 @@ const App = () => {
             </div>
           ))}
 
-          <CardDeck drawCard={drawCard} isGameOver={isGameOver} />
+          <CardDeck drawCard={drawCard} isGameOver={isGameOver} isDrawable={isDrawable} />
 
           {selfPlayer && (
             <footer className="w-full">
