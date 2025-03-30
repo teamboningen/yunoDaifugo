@@ -11,7 +11,10 @@ const App = () => {
   const [currentTurn, setCurrentTurn] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
-  const [announcement, setAnnouncement] = useState('ゲームを開始します！');
+  const [announcements, setAnnouncements] = useState([]);
+  const addAnnouncement = (msg) => {
+    setAnnouncements(prev => [msg, ...prev].slice(0, 3));
+  };
   const [isFull, setIsFull] = useState(false);
   const hasJoinedRef = useRef(false);
 
@@ -50,18 +53,18 @@ const App = () => {
       setCurrentTurn(data.currentTurn);
       setIsGameOver(data.isGameOver);
       setWinner(data.winner || null);
-      setAnnouncement(`現在のターン: ${data.players[data.currentTurn]?.name || '不明'}`);
+      addAnnouncement(`現在のターン: ${data.players[data.currentTurn]?.name || '不明'}`);
     });
 
     socket.on('playerLeft', ({ playerId }) => {
       console.log(`📢 Player ${playerId} left.`);
-      setAnnouncement(`プレイヤーが退出しました (${playerId})`);
+      addAnnouncement(`プレイヤーが退出しました (${playerId})`);
     });
 
     socket.on('cardDrawnNotice', ({ seatIndex }) => {
       console.log(`カードを引いたプレイヤー: seatIndex=${seatIndex}`);
       const next = players.find(p => p.seatIndex === currentTurn);
-      setAnnouncement(`次のターン: ${next?.name || '不明'}`);
+      addAnnouncement(`次のターン: ${next?.name || '不明'}`);
     });
 
     socket.on('cardDrawn', (data) => {
@@ -71,7 +74,7 @@ const App = () => {
       setCurrentTurn(data.nextTurn);
       setIsGameOver(data.isGameOver);
       setWinner(data.winner);
-      setAnnouncement(
+      addAnnouncement(
         data.winner ? `${data.winner} が勝利しました！` : `次のターン: ${data.players[data.nextTurn]?.name || '不明'}`
       );
     });
@@ -83,12 +86,12 @@ const App = () => {
       setCurrentTurn(data.currentTurn);
       setIsGameOver(data.isGameOver);
       setWinner(null);
-      setAnnouncement('ゲームがリセットされました。');
+      addAnnouncement('ゲームがリセットされました。');
     });
 
     socket.on('error', ({ message }) => {
       console.error(`❌ Error received: ${message}`);
-      setAnnouncement(`エラー: ${message}`);
+      addAnnouncement(`エラー: ${message}`);
     });
 
     return () => {
@@ -112,12 +115,14 @@ const App = () => {
   };
 
   const selfPlayer = players.find((p) => !!p.hand);
+  const fixedMessage = selfPlayer ? `あなたは ${selfPlayer.name} です` : '';
   const isDrawable = selfPlayer?.seatIndex === currentTurn;
+  console.log('isDrawable:', isDrawable);
   const otherPlayers = players.filter((p) => !p.hand).sort((a, b) => a.seatIndex - b.seatIndex);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      <AnnouncementBar message={announcement} />
+      <AnnouncementBar fixedMessage={fixedMessage} messages={announcements} />
 
       {isFull ? (
         <div className="full-message">

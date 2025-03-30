@@ -1,14 +1,12 @@
 import React from 'react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Info } from 'lucide-react';
 
-const AnnouncementBar = ({ message }) => {
-  return (
-    <Alert className="w-full bg-gray-100 border-b border-gray-300 py-2 px-4">
-      <Info className="w-5 h-5 text-gray-600" />
-      <AlertDescription className="ml-2 text-sm text-gray-700">{message}</AlertDescription>
-    </Alert>
-  );
-};
+const AnnouncementBar = ({ fixedMessage, messages }) => (
+  <div className="bg-yellow-100 text-gray-800 text-sm py-2 px-4 space-y-1">
+    <div className="font-semibold">{fixedMessage}</div>
+    {messages.map((msg, idx) => (
+      <div key={idx}>{msg}</div>
+    ))}
+  </div>
+);
 
 export default AnnouncementBar;
