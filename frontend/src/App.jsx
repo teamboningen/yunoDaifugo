@@ -18,6 +18,8 @@ const App = () => {
   const [isFull, setIsFull] = useState(false);
   const hasJoinedRef = useRef(false);
 
+  const getSelfPlayer = () => players.find((p) => 'hand' in p);
+
   useEffect(() => {
     console.log("🚀 useEffect triggered");
 
@@ -114,11 +116,12 @@ const App = () => {
     }
   };
 
-  const selfPlayer = players.find((p) => !!p.hand);
+  const selfPlayer = getSelfPlayer();
   const fixedMessage = selfPlayer ? `あなたは ${selfPlayer.name} です` : '';
-  const isDrawable = selfPlayer?.seatIndex === currentTurn;
+  const isDrawable = getSelfPlayer()?.seatIndex === currentTurn;
   console.log('isDrawable:', isDrawable);
-  const otherPlayers = players.filter((p) => !p.hand).sort((a, b) => a.seatIndex - b.seatIndex);
+
+  const otherPlayers = players.filter((p) => !('hand' in p)).sort((a, b) => a.seatIndex - b.seatIndex);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
