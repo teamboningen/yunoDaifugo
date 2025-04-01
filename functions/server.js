@@ -139,7 +139,7 @@ io.on('connection', (socket) => {
     console.log("📡 Sending gameLoaded event with state:", updatedGameState);
 
     await saveGameToFirestore(updatedGameState);
-    socket.emit('gameLoaded', updatedGameState);
+    socket.emit('gameLoaded', formatGameStateForPlayer(game.toJSON(), socket.id));
   });
 
   socket.on('drawCard', async () => {
