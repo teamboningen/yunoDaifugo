@@ -50,12 +50,15 @@ const App = () => {
 
     socket.on('gameLoaded', (data) => {
       console.log("📩 gameLoaded received", data);
+      console.log('✅ players in gameLoaded:', data.players);
       setPlayers(data.players);
       setDeckSize(data.deck.length);
       setCurrentTurn(data.currentTurn);
       setIsGameOver(data.isGameOver);
       setWinner(data.winner || null);
       addAnnouncement(`現在のターン: ${data.players[data.currentTurn]?.name || '不明'}`);
+      const currentPlayer = players.find(p => p.seatIndex === currentTurn);
+      if (currentPlayer?.name) addAnnouncement(`現在のターン: ${currentPlayer.name}`);
     });
 
     socket.on('playerLeft', ({ playerId }) => {
@@ -67,10 +70,13 @@ const App = () => {
       console.log(`カードを引いたプレイヤー: seatIndex=${seatIndex}`);
       const next = players.find(p => p.seatIndex === currentTurn);
       addAnnouncement(`次のターン: ${next?.name || '不明'}`);
+      const currentPlayer = players.find(p => p.seatIndex === currentTurn);
+      if (currentPlayer?.name) addAnnouncement(`現在のターン: ${currentPlayer.name}`);
     });
 
     socket.on('cardDrawn', (data) => {
       console.log("🎴 cardDrawn received", data);
+      console.log('✅ players in cardDrawn:', data.players);
       setPlayers(data.players);
       setDeckSize(data.deckSize);
       setCurrentTurn(data.nextTurn);
@@ -79,6 +85,8 @@ const App = () => {
       addAnnouncement(
         data.winner ? `${data.winner} が勝利しました！` : `次のターン: ${data.players[data.nextTurn]?.name || '不明'}`
       );
+      const currentPlayer = players.find(p => p.seatIndex === currentTurn);
+      if (currentPlayer?.name) addAnnouncement(`現在のターン: ${currentPlayer.name}`);
     });
 
     socket.on('gameReset', (data) => {
@@ -89,6 +97,8 @@ const App = () => {
       setIsGameOver(data.isGameOver);
       setWinner(null);
       addAnnouncement('ゲームがリセットされました。');
+      const currentPlayer = players.find(p => p.seatIndex === currentTurn);
+      if (currentPlayer?.name) addAnnouncement(`現在のターン: ${currentPlayer.name}`);
     });
 
     socket.on('error', ({ message }) => {
