@@ -181,7 +181,6 @@ io.on('connection', (socket) => {
       });
     });
         io.to(player.id).emit('gameUpdated', formatGameStateForPlayer(gameState, player.id));
-      });
     } else {
       console.error("❌ Card draw failed.");
       socket.emit('error', { message: 'カードが引けませんでした。' });
@@ -212,7 +211,6 @@ io.on('connection', (socket) => {
       io.to(player.id).emit('gameUpdated', {
         ...formatGameStateForPlayer(gameState, player.id),
         announcements
-      });
     });
       io.to(player.id).emit('gameReset', formatGameStateForPlayer(gameState, player.id));
     });
