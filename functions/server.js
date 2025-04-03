@@ -69,77 +69,44 @@ async function initializeGameIfNeeded() {
     const newGame = new Game();
     newGame.initialize();
     gameState = newGame.toJSON();
-
     await saveGameToFirestore(gameState);
-    console.log("✅ New game initialized and saved to Firestore.");
+    console.log("✅ Game initialized and saved.");
   } else {
-    console.log("✅ Existing game found in Firestore.");
-  }
-  return gameState;
-}
-
-async function main() {
-  try {
-    console.log("🔄 Initializing game state before starting the server...");
-    await initializeGameIfNeeded();
-    console.log("🟢 Game initialization complete. Starting the server...");
-
-    const PORT = process.env.PORT || 3000;
-    server.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
-
-  } catch (error) {
-    console.error("❌ Server initialization failed:", error);
-    process.exit(1);
+    console.log("✅ Existing game found. No need to initialize.");
   }
 }
 
-main();
+initializeGameIfNeeded();
 
 io.on('connection', (socket) => {
-  console.log(`🔗 User connected: ${socket.id}`);
+  console.log(`🟢 New connection: ${socket.id}`);
 
   socket.on('joinGame', async () => {
-    console.log(`🎮 joinGame received from: ${socket.id}`);
+    console.log(`📥 joinGame request from: ${socket.id}`);
 
     const currentGameState = await loadGameFromFirestore();
-    let game = new Game();
+    if (!currentGameState) return;
 
-    if (currentGameState) {
-      console.log("♻️ Loading existing game state...");
-      game.loadState(currentGameState);
-    } else {
-      console.log("🆕 Initializing new game...");
-      game.initialize();
-    }
+    const game = new Game();
+    game.loadState(currentGameState);
 
-    console.log("👥 Current players before joining:", game.players);
-
-    let existingPlayer = game.players.find(p => p.id === socket.id);
-
-    if (!existingPlayer) {
-      const emptySlot = game.players.find(p => p.id === null);
-      if (emptySlot) {
-        console.log(`🔄 Assigning socket.id ${socket.id} to empty player slot`);
-        emptySlot.id = socket.id;
-        existingPlayer = emptySlot;
-      }
-    }
-
-    if (!existingPlayer) {
-      console.log(`🚫 Game full. Rejecting player: ${socket.id}`);
+    if (game.players.length >= 2) {
       socket.emit('gameFull');
       return;
     }
 
-    console.log("👥 Updated players:", game.players);
+    const newPlayer = game.addPlayer(socket.id);
+    if (!newPlayer) {
+      socket.emit('error', { message: '参加できませんでした。' });
+      return;
+    }
 
-    const updatedGameState = game.toJSON();
-    console.log("📡 Sending gameLoaded event with state:", updatedGameState);
+    const gameState = game.toJSON();
+    await saveGameToFirestore(gameState);
 
-    await saveGameToFirestore(updatedGameState);
-    socket.emit('gameLoaded', formatGameStateForPlayer(game.toJSON(), socket.id));
+    game.players.forEach(player => {
+      io.to(player.id).emit('gameLoaded', formatGameStateForPlayer(gameState, player.id));
+    });
   });
 
   socket.on('drawCard', async () => {
@@ -162,25 +129,25 @@ io.on('connection', (socket) => {
     const result = game.drawCard(playerIndex);
 
     if (result) {
-    const drawer = game.players[playerIndex];
-    const nextPlayer = game.players[game.currentTurn];
-    const announcements = [
-      `${drawer.name} がカードを引きました`,
-      `${nextPlayer.name} のターンです`
-    ];
       console.log("✅ Card drawn successfully.");
       const gameState = game.toJSON();
       await saveGameToFirestore(gameState);
 
+      const drawer = game.players[playerIndex];
+      const nextPlayer = game.players[game.currentTurn];
+      const announcements = [
+        `${drawer.name} がカードを引きました`,
+        `${nextPlayer.name} のターンです`
+      ];
+
       io.emit('cardDrawnNotice', { seatIndex: playerIndex });
 
-    game.players.forEach(player => {
-      io.to(player.id).emit('gameUpdated', {
-        ...formatGameStateForPlayer(gameState, player.id),
-        announcements
+      game.players.forEach(player => {
+        io.to(player.id).emit('gameUpdated', {
+          ...formatGameStateForPlayer(gameState, player.id),
+          announcements
+        });
       });
-    });
-        io.to(player.id).emit('gameUpdated', formatGameStateForPlayer(gameState, player.id));
     } else {
       console.error("❌ Card draw failed.");
       socket.emit('error', { message: 'カードが引けませんでした。' });
@@ -188,37 +155,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('resetGame', async () => {
-    console.log('🔄 Game reset requested by:', socket.id);
-
-    const currentGameState = await loadGameFromFirestore();
-    const game = new Game();
-
-    if (currentGameState) {
-      game.loadState(currentGameState);
-    }
-
-    console.log("🆕 Initializing new game state...");
-    game.initialize();
-
-    await saveGameToFirestore(game.toJSON());
-    const currentPlayer = game.players[game.currentTurn];
-    const announcements = [
-      'ゲームがリセットされました。',
-      `${currentPlayer.name} のターンです`
-    ];
-    const gameState = game.toJSON();
-    game.players.forEach(player => {
-      io.to(player.id).emit('gameUpdated', {
-        ...formatGameStateForPlayer(gameState, player.id),
-        announcements
-    });
-      io.to(player.id).emit('gameReset', formatGameStateForPlayer(gameState, player.id));
-    });
-    console.log('✅ Game has been reset.');
-  });
-
-  socket.on('disconnect', async () => {
-    console.log(`🔌 User disconnected: ${socket.id}`);
+    console.log("🔄 resetGame received.");
 
     const currentGameState = await loadGameFromFirestore();
     if (!currentGameState) return;
@@ -226,12 +163,57 @@ io.on('connection', (socket) => {
     const game = new Game();
     game.loadState(currentGameState);
 
-    const playerToUpdate = game.players.find((player) => player.id === socket.id);
-    if (playerToUpdate) {
-      console.log(`🔄 Resetting player slot for ${socket.id}`);
-      playerToUpdate.id = null;
-      await saveGameToFirestore(game.toJSON());
-      io.emit('playerLeft', { seatIndex: playerToUpdate.seatIndex });
-    }
+    game.reset();
+
+    const gameState = game.toJSON();
+    await saveGameToFirestore(gameState);
+
+    const currentPlayer = game.players[game.currentTurn];
+    const announcements = [
+      'ゲームがリセットされました。',
+      `${currentPlayer.name} のターンです`
+    ];
+
+    game.players.forEach(player => {
+      io.to(player.id).emit('gameUpdated', {
+        ...formatGameStateForPlayer(gameState, player.id),
+        announcements
+      });
+    });
   });
+
+  socket.on('disconnect', async () => {
+    console.log(`⚠️ Socket disconnected: ${socket.id}`);
+
+    const currentGameState = await loadGameFromFirestore();
+    if (!currentGameState) return;
+
+    const game = new Game();
+    game.loadState(currentGameState);
+
+    const playerIndex = game.players.findIndex((p) => p.id === socket.id);
+    if (playerIndex === -1) return;
+
+    const leavingPlayer = game.players[playerIndex];
+    game.removePlayer(socket.id);
+
+    const gameState = game.toJSON();
+    await saveGameToFirestore(gameState);
+
+    const announcements = [
+      `${leavingPlayer.name} が退出しました`
+    ];
+
+    game.players.forEach(player => {
+      io.to(player.id).emit('gameUpdated', {
+        ...formatGameStateForPlayer(gameState, player.id),
+        announcements
+      });
+    });
+  });
+});
+
+const PORT = process.env.PORT || 3001;
+server.listen(PORT, () => {
+  console.log(`🚀 Server listening on port ${PORT}`);
 });
