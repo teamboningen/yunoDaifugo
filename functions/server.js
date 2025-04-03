@@ -162,13 +162,24 @@ io.on('connection', (socket) => {
     const result = game.drawCard(playerIndex);
 
     if (result) {
+    const drawer = game.players[playerIndex];
+    const nextPlayer = game.players[game.currentTurn];
+    const announcements = [
+      `${drawer.name} がカードを引きました`,
+      `${nextPlayer.name} のターンです`
+    ];
       console.log("✅ Card drawn successfully.");
       const gameState = game.toJSON();
       await saveGameToFirestore(gameState);
 
       io.emit('cardDrawnNotice', { seatIndex: playerIndex });
 
-      game.players.forEach(player => {
+    game.players.forEach(player => {
+      io.to(player.id).emit('gameUpdated', {
+        ...formatGameStateForPlayer(gameState, player.id),
+        announcements
+      });
+    });
         io.to(player.id).emit('gameUpdated', formatGameStateForPlayer(gameState, player.id));
       });
     } else {
@@ -191,8 +202,18 @@ io.on('connection', (socket) => {
     game.initialize();
 
     await saveGameToFirestore(game.toJSON());
+    const currentPlayer = game.players[game.currentTurn];
+    const announcements = [
+      'ゲームがリセットされました。',
+      `${currentPlayer.name} のターンです`
+    ];
     const gameState = game.toJSON();
     game.players.forEach(player => {
+      io.to(player.id).emit('gameUpdated', {
+        ...formatGameStateForPlayer(gameState, player.id),
+        announcements
+      });
+    });
       io.to(player.id).emit('gameReset', formatGameStateForPlayer(gameState, player.id));
     });
     console.log('✅ Game has been reset.');

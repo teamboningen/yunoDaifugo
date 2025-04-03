@@ -1,3 +1,4 @@
+// ※ 先頭は元のまま
 import React, { useEffect, useState, useRef } from 'react';
 import socket from './socket';
 import AnnouncementBar from './components/AnnouncementBar';
@@ -61,32 +62,29 @@ const App = () => {
       if (currentPlayer?.name) addAnnouncement(`現在のターン: ${currentPlayer.name}`);
     });
 
+    socket.on('gameUpdated', (data) => {
+      console.log("🆕 gameUpdated received", data);
+      setPlayers(data.players);
+      setDeckSize(data.deckSize);
+      setCurrentTurn(data.currentTurn);
+      setIsGameOver(data.isGameOver);
+      setWinner(data.winner);
+
+      const currentPlayer = data.players[data.currentTurn];
+      if (currentPlayer?.name) {
+        addAnnouncement(`現在のターン: ${currentPlayer.name}`);
+      }
+    });
+
     socket.on('playerLeft', ({ playerId }) => {
       console.log(`📢 Player ${playerId} left.`);
       addAnnouncement(`プレイヤーが退出しました (${playerId})`);
     });
 
     socket.on('cardDrawnNotice', ({ seatIndex }) => {
+      const player = players.find(p => p.seatIndex === seatIndex);
+      if (player?.name) addAnnouncement(`現在のターン: ${player.name}`);
       console.log(`カードを引いたプレイヤー: seatIndex=${seatIndex}`);
-      const next = players.find(p => p.seatIndex === currentTurn);
-      addAnnouncement(`次のターン: ${next?.name || '不明'}`);
-      const currentPlayer = players.find(p => p.seatIndex === currentTurn);
-      if (currentPlayer?.name) addAnnouncement(`現在のターン: ${currentPlayer.name}`);
-    });
-
-    socket.on('cardDrawn', (data) => {
-      console.log("🎴 cardDrawn received", data);
-      console.log('✅ players in cardDrawn:', data.players);
-      setPlayers(data.players);
-      setDeckSize(data.deckSize);
-      setCurrentTurn(data.nextTurn);
-      setIsGameOver(data.isGameOver);
-      setWinner(data.winner);
-      addAnnouncement(
-        data.winner ? `${data.winner} が勝利しました！` : `次のターン: ${data.players[data.nextTurn]?.name || '不明'}`
-      );
-      const currentPlayer = players.find(p => p.seatIndex === currentTurn);
-      if (currentPlayer?.name) addAnnouncement(`現在のターン: ${currentPlayer.name}`);
     });
 
     socket.on('gameReset', (data) => {
@@ -113,9 +111,10 @@ const App = () => {
       socket.off("gameFull");
       socket.off('gameLoaded');
       socket.off('playerLeft');
-      socket.off('cardDrawn');
+      socket.off('cardDrawnNotice');
       socket.off('gameReset');
       socket.off('error');
+      socket.off('gameUpdated');
     };
   }, []);
 
