@@ -1,4 +1,3 @@
-// ※ 先頭は元のまま
 import React, { useEffect, useState, useRef } from 'react';
 import socket from './socket';
 import AnnouncementBar from './components/AnnouncementBar';
@@ -13,11 +12,12 @@ const App = () => {
   const [isGameOver, setIsGameOver] = useState(false);
   const [winner, setWinner] = useState(null);
   const [announcements, setAnnouncements] = useState([]);
+  const [isFull, setIsFull] = useState(false);
+  const hasJoinedRef = useRef(false);
+
   const addAnnouncement = (msg) => {
     setAnnouncements(prev => [msg, ...prev].slice(0, 3));
   };
-  const [isFull, setIsFull] = useState(false);
-  const hasJoinedRef = useRef(false);
 
   const getSelfPlayer = () => players.find((p) => 'hand' in p);
 
@@ -51,52 +51,30 @@ const App = () => {
 
     socket.on('gameLoaded', (data) => {
       console.log("📩 gameLoaded received", data);
-      console.log('✅ players in gameLoaded:', data.players);
       setPlayers(data.players);
       setDeckSize(data.deck.length);
       setCurrentTurn(data.currentTurn);
       setIsGameOver(data.isGameOver);
       setWinner(data.winner || null);
       addAnnouncement(`現在のターン: ${data.players[data.currentTurn]?.name || '不明'}`);
-      const currentPlayer = players.find(p => p.seatIndex === currentTurn);
-      if (currentPlayer?.name) addAnnouncement(`現在のターン: ${currentPlayer.name}`);
     });
 
     socket.on('gameUpdated', (data) => {
-      console.log("🆕 gameUpdated received", data);
-      setPlayers(data.players);
-      setDeckSize(data.deckSize);
-      setCurrentTurn(data.currentTurn);
-      setIsGameOver(data.isGameOver);
-      setWinner(data.winner);
-
-      const currentPlayer = data.players[data.currentTurn];
-      if (currentPlayer?.name) {
-        addAnnouncement(`現在のターン: ${currentPlayer.name}`);
-      }
-    });
-
-    socket.on('playerLeft', ({ playerId }) => {
-      console.log(`📢 Player ${playerId} left.`);
-      addAnnouncement(`プレイヤーが退出しました (${playerId})`);
-    });
-
-    socket.on('cardDrawnNotice', ({ seatIndex }) => {
-      const player = players.find(p => p.seatIndex === seatIndex);
-      if (player?.name) addAnnouncement(`現在のターン: ${player.name}`);
-      console.log(`カードを引いたプレイヤー: seatIndex=${seatIndex}`);
-    });
-
-    socket.on('gameReset', (data) => {
-      console.log("🔄 gameReset received", data);
+      console.log('📩 gameUpdated received', data);
       setPlayers(data.players);
       setDeckSize(data.deck.length);
       setCurrentTurn(data.currentTurn);
       setIsGameOver(data.isGameOver);
-      setWinner(null);
-      addAnnouncement('ゲームがリセットされました。');
-      const currentPlayer = players.find(p => p.seatIndex === currentTurn);
-      if (currentPlayer?.name) addAnnouncement(`現在のターン: ${currentPlayer.name}`);
+      setWinner(data.winner || null);
+      const self = data.players.find(p => p.id === socket.id);
+      if (self?.hand) {
+        setHand(self.hand);
+      }
+      if (Array.isArray(data.announcements)) {
+        data.announcements.forEach((msg) => {
+          if (msg) addAnnouncement(msg);
+        });
+      }
     });
 
     socket.on('error', ({ message }) => {
@@ -110,11 +88,8 @@ const App = () => {
       socket.off("disconnect");
       socket.off("gameFull");
       socket.off('gameLoaded');
-      socket.off('playerLeft');
-      socket.off('cardDrawnNotice');
-      socket.off('gameReset');
-      socket.off('error');
       socket.off('gameUpdated');
+      socket.off('error');
     };
   }, []);
 
@@ -129,7 +104,6 @@ const App = () => {
   const fixedMessage = selfPlayer ? `あなたは ${selfPlayer.name} です` : '';
   const isDrawable = getSelfPlayer()?.seatIndex === currentTurn;
   console.log('isDrawable:', isDrawable);
-
   const otherPlayers = players.filter((p) => !('hand' in p)).sort((a, b) => a.seatIndex - b.seatIndex);
 
   return (
