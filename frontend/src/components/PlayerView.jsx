@@ -1,48 +1,25 @@
-import React, { useState } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import React from 'react';
 
-const suits = {
-  hearts: '♥',
-  diamonds: '♦',
-  clubs: '♣',
-  spades: '♠',
-};
-
-const PlayerView = ({ playerName, cards, isOpponent = false }) => {
-  const [selectedCards, setSelectedCards] = useState([]);
-
-  const toggleCardSelection = (index) => {
-    if (!isOpponent) {
-      setSelectedCards((prev) =>
-        prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
-      );
-    }
-  };
-
-  return (
-    <div className="p-4">
-      <h2 className="text-lg font-semibold mb-2 text-center">{playerName}</h2>
-      <ScrollArea className="w-full">
-        <div className="flex space-x-2 justify-center">
-          {cards.map((card, index) => (
-            <div
-              key={index}
-              onClick={() => toggleCardSelection(index)}
-              className={`w-16 h-24 flex justify-center items-center rounded-lg border cursor-pointer select-none transition-transform 
-                ${selectedCards.includes(index) ? 'border-blue-500 scale-105' : 'border-gray-300'}
-                ${isOpponent ? 'bg-gray-300 cursor-default' : 'bg-white'}`}
-            >
-              {!isOpponent && (
-                <span className={`text-xl font-bold ${['hearts', 'diamonds'].includes(card.suit) ? 'text-red-500' : 'text-black'}`}>
-                  {suits[card.suit]} {card.rank}
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
+const PlayerView = ({ playerName, cards = [] }) => (
+  <div className="text-center my-2 px-2">
+    <div className="text-xs text-gray-700 font-medium mb-1">{playerName}の手札: {cards.length}枚</div>
+    <div className="flex justify-start overflow-x-auto space-x-2 px-1">
+      {cards.map((card, i) => {
+        const isRed = card.suit === '♥' || card.suit === '♦';
+        return (
+          <div
+            key={i}
+            className="w-14 h-20 rounded-lg shadow-md border border-gray-400 bg-white flex flex-col justify-between px-1 py-1 text-xs"
+            style={{ color: isRed ? 'red' : 'black' }}
+          >
+            <div className="text-left">{card.rank}</div>
+            <div className="text-center text-lg">{card.suit}</div>
+            <div className="text-right rotate-180">{card.rank}</div>
+          </div>
+        );
+      })}
     </div>
-  );
-};
+  </div>
+);
 
 export default PlayerView;

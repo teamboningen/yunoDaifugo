@@ -3,6 +3,7 @@ import socket from './socket';
 import AnnouncementBar from './components/AnnouncementBar';
 import CardDeck from './components/CardDeck';
 import PlayerView from './components/PlayerView';
+import OpponentView from './components/OpponentView';
 import GameControls from './components/GameControls';
 
 const App = () => {
@@ -56,7 +57,7 @@ const App = () => {
       setCurrentTurn(data.currentTurn);
       setIsGameOver(data.isGameOver);
       setWinner(data.winner || null);
-      addAnnouncement(`現在のターン: ${data.players[data.currentTurn]?.name || '不明'}`);
+      addAnnouncement({ message: `現在のターン: ${data.players[data.currentTurn]?.name || '不明'}`, time: new Date().toISOString() });
     });
 
     socket.on('gameUpdated', (data) => {
@@ -71,15 +72,13 @@ const App = () => {
         setHand(self.hand);
       }
       if (Array.isArray(data.announcements)) {
-        data.announcements.forEach((msg) => {
-          if (msg) addAnnouncement(msg);
-        });
+        setAnnouncements(prev => [...data.announcements, ...prev].slice(0, 3));
       }
     });
 
     socket.on('error', ({ message }) => {
       console.error(`❌ Error received: ${message}`);
-      addAnnouncement(`エラー: ${message}`);
+      addAnnouncement({ message: `エラー: ${message}`, time: new Date().toISOString() });
     });
 
     return () => {
@@ -120,13 +119,11 @@ const App = () => {
       ) : (
         <main className="flex flex-col flex-grow justify-between items-center">
           {otherPlayers.map((player) => (
-            <div key={player.seatIndex} className="w-full flex justify-center my-4">
-              <PlayerView
-                playerName={player.name}
-                cards={Array(player.handSize ?? 0).fill({ rank: '?', suit: 'back' })}
-                isOpponent
-              />
-            </div>
+            <OpponentView
+              key={player.seatIndex}
+              playerName={player.name}
+              handSize={player.handSize ?? 0}
+            />
           ))}
 
           <CardDeck drawCard={drawCard} isGameOver={isGameOver} isDrawable={isDrawable} />

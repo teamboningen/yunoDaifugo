@@ -164,9 +164,10 @@ io.on('connection', (socket) => {
     if (result) {
       const drawer = game.players[playerIndex];
       const nextPlayer = game.players[game.currentTurn];
+      const now = new Date().toISOString();
       const announcements = [
-        `${drawer.name} がカードを引きました`,
-        `${nextPlayer.name} のターンです`
+          { message: `${drawer.name} がカードを引きました`, time: now },
+          { message: `${nextPlayer.name} のターンです`, time: now }
       ];
       console.log("✅ Card drawn successfully.");
       const gameState = game.toJSON();
@@ -200,8 +201,8 @@ io.on('connection', (socket) => {
     await saveGameToFirestore(game.toJSON());
     const currentPlayer = game.players[game.currentTurn];
     const announcements = [
-      'ゲームがリセットされました。',
-      `${currentPlayer.name} のターンです`
+        { message: 'ゲームがリセットされました。', time: now },
+        { message: `${currentPlayer.name} のターンです`, time: now }
     ];
     const gameState = game.toJSON();
     game.players.forEach(player => {
@@ -227,6 +228,7 @@ io.on('connection', (socket) => {
       console.log(`🔄 Resetting player slot for ${socket.id}`);
       playerToUpdate.id = null;
       await saveGameToFirestore(game.toJSON());
+      const now = new Date().toISOString();
       const announcements = [
         `${playerToUpdate.name} が退出しました`
       ];

@@ -1,31 +1,32 @@
 import React from 'react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Info } from 'lucide-react';
 
-const AnnouncementBar = ({ fixedMessage, messages }) => {
-  return (
-    <div className="w-full px-4 py-2 space-y-1">
-      {fixedMessage && (
-        <Alert className="w-full bg-blue-50 border-blue-200 py-2 px-4 flex items-center">
-          <Info className="w-5 h-5 text-blue-600 mr-2" />
-          <AlertDescription className="text-sm text-blue-800 font-semibold">
-            {fixedMessage}
-          </AlertDescription>
-        </Alert>
-      )}
-      {messages.map((msg, index) => (
-        <Alert
-          key={index}
-          className="w-full bg-gray-100 border-b border-gray-300 py-2 px-4 flex items-center"
-        >
-          <Info className="w-5 h-5 text-gray-600 mr-2" />
-          <AlertDescription className="text-sm text-gray-700">
-            {msg}
-          </AlertDescription>
-        </Alert>
-      ))}
-    </div>
-  );
+const formatTime = (isoTime) => {
+  const date = new Date(isoTime);
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
+
+const AnnouncementBar = ({ fixedMessage, messages = [] }) => (
+  <div className="bg-[#E5E7EB] p-3 w-full">
+    <div className="flex items-center p-3 rounded-md bg-white shadow text-gray-800 font-medium mb-2">
+      <svg className="w-4 h-4 mr-2 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+      </svg>
+      {fixedMessage}
+    </div>
+    <ul className="space-y-2">
+      {messages.map((msg, idx) => (
+        <li key={idx} className="flex justify-between items-center text-sm text-gray-900 bg-white px-4 py-3 rounded-lg shadow-sm">
+          <div className="flex items-center">
+            <svg className="w-4 h-4 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 12h2V8H9v4zm0 4h2v-2H9v2zm1-16a9 9 0 100 18 9 9 0 000-18z" />
+            </svg>
+            <span>{msg.message}</span>
+          </div>
+          <span className="text-xs text-gray-500">{formatTime(msg.time)}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
 
 export default AnnouncementBar;

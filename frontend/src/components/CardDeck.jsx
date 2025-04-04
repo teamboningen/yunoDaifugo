@@ -1,29 +1,29 @@
 import React from 'react';
 
-const CardDeck = ({ drawCard, isGameOver, isDrawable }) => {
-  const handleClick = () => {
-    if (!isGameOver && isDrawable) {
-      drawCard();
-    }
-  };
+const CardDeck = ({ deckSize = 0, drawCard, isDrawable, isGameOver }) => {
+  if (isGameOver) return null;
 
   return (
-    <div className="my-6 cursor-pointer">
-      <svg
-        width="100"
-        height="140"
-        viewBox="0 0 100 140"
-        onClick={handleClick}
-        className={`transition-opacity duration-300 mx-auto drop-shadow-md ${
-          isDrawable ? 'opacity-100' : 'opacity-50 pointer-events-none'
-        }`}
-        style={{ cursor: isDrawable ? 'pointer' : 'default' }}
-      >
-        <rect width="100" height="140" rx="10" fill="#2d3748" stroke="#718096" strokeWidth="3" />
-        <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="#cbd5e0" fontSize="20">
-          DECK
-        </text>
-      </svg>
+    <div className="my-4 flex justify-center">
+      <button onClick={isDrawable ? drawCard : undefined} disabled={!isDrawable} className="relative">
+        {[...Array(Math.min(deckSize, 3))].map((_, i) => (
+          <svg
+            key={i}
+            className="w-10 h-14 absolute"
+            style={{ left: `${i * 6}px`, zIndex: i }}
+            viewBox="0 0 100 140"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <linearGradient id="cardBackGradient" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#3b82f6" />
+                <stop offset="100%" stopColor="#1e3a8a" />
+              </linearGradient>
+            </defs>
+            <rect width="100" height="140" rx="12" fill="url(#cardBackGradient)" stroke="#1e3a8a" strokeWidth="2" />
+          </svg>
+        ))}
+      </button>
     </div>
   );
 };
