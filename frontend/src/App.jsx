@@ -117,7 +117,7 @@ const App = () => {
           </button>
         </div>
       ) : (
-        <main className="flex flex-col flex-grow justify-between items-center">
+        <main className="flex flex-col flex-grow justify-between items-stretch w-full">
           {otherPlayers.map((player) => (
             <OpponentView
               key={player.seatIndex}
