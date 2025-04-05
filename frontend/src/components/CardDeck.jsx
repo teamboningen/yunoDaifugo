@@ -1,11 +1,12 @@
-import React from 'react';
+import React from 'react'
+import { Button } from '@/components/ui/button'
 
 const CardDeck = ({ deckSize = 0, drawCard, isDrawable, isGameOver }) => {
   if (isGameOver) return null;
 
   return (
     <div className="my-4 flex justify-center">
-      <button onClick={isDrawable ? drawCard : undefined} disabled={!isDrawable} className="relative">
+      <Button onClick={isDrawable ? drawCard : undefined} disabled={!isDrawable} className="relative">
         {[...Array(Math.min(deckSize, 3))].map((_, i) => (
           <svg
             key={i}
@@ -23,7 +24,7 @@ const CardDeck = ({ deckSize = 0, drawCard, isDrawable, isGameOver }) => {
             <rect width="100" height="140" rx="12" fill="url(#cardBackGradient)" stroke="#1e3a8a" strokeWidth="2" />
           </svg>
         ))}
-      </button>
+      </Button>
     </div>
   );
 };
