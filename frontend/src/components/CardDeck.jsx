@@ -1,32 +1,42 @@
 import React from 'react'
-import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import CardBackSVG from './CardBackSVG'
+import { cn } from '@/lib/utils'
 
-const CardDeck = ({ deckSize = 0, drawCard, isDrawable, isGameOver }) => {
-  if (isGameOver) return null;
+const CardWrapper = ({ transform = '', isCenter = false, isDrawable }) => (
+  <div className={cn("absolute w-16 h-24", transform)}>
+    <Card
+      className={cn(
+        isCenter ? "w-16 h-24" : "w-full h-full",
+        "p-0 overflow-hidden border-2",
+        isDrawable ? "border-blue-300" : "border-gray-400",
+        !isDrawable && "opacity-50"
+      )}
+    >
+      <CardBackSVG />
+    </Card>
+  </div>
+)
+
+const CardDeck = ({ drawCard, isDrawable, isGameOver }) => {
+  if (isGameOver) return null
 
   return (
-    <div className="my-4 flex justify-center">
-      <Button onClick={isDrawable ? drawCard : undefined} disabled={!isDrawable} className="relative">
-        {[...Array(Math.min(deckSize, 3))].map((_, i) => (
-          <svg
-            key={i}
-            className="w-10 h-14 absolute"
-            style={{ left: `${i * 6}px`, zIndex: i }}
-            viewBox="0 0 100 140"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <linearGradient id="cardBackGradient" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#3b82f6" />
-                <stop offset="100%" stopColor="#1e3a8a" />
-              </linearGradient>
-            </defs>
-            <rect width="100" height="140" rx="12" fill="url(#cardBackGradient)" stroke="#1e3a8a" strokeWidth="2" />
-          </svg>
-        ))}
-      </Button>
+    <div className="flex justify-center my-4">
+      <button
+        onClick={() => { if (isDrawable) { drawCard() } }}
+        disabled={!isDrawable}
+        className={cn(
+          "relative mb-2 w-16 h-24",
+          !isDrawable && "opacity-50 cursor-not-allowed"
+        )}
+      >
+        <CardWrapper transform="-left-1 top-0 transform rotate-3" isDrawable={isDrawable} />
+        <CardWrapper transform="-right-1 top-0 transform -rotate-3" isDrawable={isDrawable} />
+        <CardWrapper isCenter isDrawable={isDrawable} />
+      </button>
     </div>
-  );
-};
+  )
+}
 
-export default CardDeck;
+export default CardDeck
