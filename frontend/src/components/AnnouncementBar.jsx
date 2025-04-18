@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Bell, User } from 'lucide-react'
 
@@ -8,27 +8,46 @@ function formatTime(timestamp) {
 }
 
 const AnnouncementBar = ({ fixedMessage, messages }) => {
+  const containerRef = useRef(null)
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (el) {
+      el.scrollTop = el.scrollHeight // 常に最新（最下部）を表示
+    }
+  }, [messages])
+
   return (
     <div className="flex flex-col gap-2">
+      {/* 固定メッセージ（変わらず上部に表示） */}
       <Alert className="bg-white shadow text-gray-800 font-medium">
         <User className="h-4 w-4 mr-2" />
         <AlertDescription>{fixedMessage}</AlertDescription>
       </Alert>
-      <ul className="flex flex-col gap-2">
-        {messages.slice(0, 3).map((msg, index) => (
-          <li key={index}>
-            <Alert className="bg-white shadow-sm">
-              <div className="flex justify-between items-center w-full">
-                <div className="flex items-center gap-2">
-                  <Bell className="h-4 w-4 text-gray-600" />
-                  <AlertDescription>{msg.message}</AlertDescription>
+
+      {/* アナウンス表示（縦スクロール、2.5件分、初期状態で最新が見える） */}
+      <div
+        ref={containerRef}
+        className="w-full max-w-full min-h-[9rem] sm:min-h-[10rem] md:min-h-[11rem] max-h-[30vh] overflow-y-auto px-1 py-1 rounded-md border border-gray-300 bg-white shadow-inner scroll-smooth"
+      >
+        <ul className="flex flex-col gap-2 w-full">
+          {messages.slice(0, 3).map((msg, index) => (
+            <li key={index}>
+              <Alert className="bg-white shadow-sm w-full">
+                <div className="flex justify-between items-center w-full">
+                  <div className="flex items-center gap-2">
+                    <Bell className="h-4 w-4 text-gray-600" />
+                    <AlertDescription>{msg.message}</AlertDescription>
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {formatTime(msg.time)}
+                  </span>
                 </div>
-                <span className="text-xs text-gray-500">{formatTime(msg.time)}</span>
-              </div>
-            </Alert>
-          </li>
-        ))}
-      </ul>
+              </Alert>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }

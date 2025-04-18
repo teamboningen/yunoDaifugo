@@ -32,7 +32,7 @@ class Game {
     player.cards.push(card);
     player.score += card.value;
 
-    if (player.cards.length === 5 || this.deck.size === 0) {
+    if (this.players.every(p => p.cards.length >= 5) || this.deck.size === 0) {
       this.isGameOver = true;
       let highestScore = -1;
       let winner = null;
