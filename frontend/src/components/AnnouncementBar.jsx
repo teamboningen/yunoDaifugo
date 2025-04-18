@@ -28,7 +28,7 @@ const AnnouncementBar = ({ fixedMessage, messages }) => {
       {/* アナウンス表示（縦スクロール、2.5件分、初期状態で最新が見える） */}
       <div
         ref={containerRef}
-        className="w-full max-w-full min-h-[9rem] sm:min-h-[10rem] md:min-h-[11rem] max-h-[30vh] overflow-y-auto px-1 py-1 rounded-md border border-gray-300 bg-white shadow-inner scroll-smooth"
+        className="h-[135px] overflow-y-auto scroll-smooth w-full max-w-[600px] px-1 py-1 rounded-md"
       >
         <ul className="flex flex-col gap-2 w-full">
           {messages.slice(0, 3).map((msg, index) => (
