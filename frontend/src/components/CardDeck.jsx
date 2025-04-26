@@ -31,8 +31,8 @@ const CardDeck = ({ drawCard, isDrawable, isGameOver }) => {
           !isDrawable && "opacity-50 cursor-not-allowed"
         )}
       >
-        <CardWrapper transform="-left-1 top-0 transform rotate-3" isDrawable={isDrawable} />
-        <CardWrapper transform="-right-1 top-0 transform -rotate-3" isDrawable={isDrawable} />
+        <CardWrapper transform="-translate-x-0.5 top-0 transform rotate-2" isDrawable={isDrawable} />
+        <CardWrapper transform="translate-x-0.5 top-0 transform -rotate-2" isDrawable={isDrawable} />
         <CardWrapper isCenter isDrawable={isDrawable} />
       </button>
     </div>
