@@ -164,15 +164,23 @@ io.on('connection', (socket) => {
     if (result) {
       const drawer = game.players[playerIndex];
       const nextPlayer = game.players[game.currentTurn];
-      const now = new Date().toISOString();
       const announcements = [
-          { message: `${drawer.name} がカードを引きました`, time: now }
+        {
+          message: `${drawer.name} がカードを引きました`,
+          time: new Date().toISOString()
+        }
       ];
       
       if (result.isGameOver && result.winner) {
-          announcements.push({ message: `ゲーム終了！ ${result.winner} の勝利です！`, time: now });
+          announcements.push({
+            message: `ゲーム終了！ ${result.winner} の勝利です！`,
+            time: new Date().toISOString()
+          });
       } else {
-          announcements.push({ message: `${nextPlayer.name} のターンです`, time: now });
+          announcements.push({
+            message: `${nextPlayer.name} のターンです`,
+            time: new Date().toISOString()
+          });
       }
       console.log("✅ Card drawn successfully.");
       const gameState = game.toJSON();
