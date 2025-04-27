@@ -106,7 +106,7 @@ const App = () => {
   const otherPlayers = players.filter((p) => !('hand' in p)).sort((a, b) => a.seatIndex - b.seatIndex);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#1a472a' }}>
       <AnnouncementBar fixedMessage={fixedMessage} messages={announcements} />
 
       {isFull ? (
@@ -117,7 +117,7 @@ const App = () => {
           </button>
         </div>
       ) : (
-        <main className="flex flex-col flex-grow justify-between items-stretch w-full">
+        <main className="flex flex-col flex-grow justify-between items-stretch w-full" style={{ backgroundColor: '#1a472a' }}>
           {otherPlayers.map((player) => (
             <OpponentView
               key={player.seatIndex}
