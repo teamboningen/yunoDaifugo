@@ -166,19 +166,18 @@ io.on('connection', (socket) => {
       const nextPlayer = game.players[game.currentTurn];
       const announcements = [
         {
+          message: `${nextPlayer.name} のターンです`,
+          time: new Date().toISOString()
+        },
+        {
           message: `${drawer.name} がカードを引きました`,
           time: new Date().toISOString()
         }
       ];
       
       if (result.isGameOver && result.winner) {
-          announcements.push({
+          announcements.unshift({
             message: `ゲーム終了！ ${result.winner} の勝利です！`,
-            time: new Date().toISOString()
-          });
-      } else {
-          announcements.push({
-            message: `${nextPlayer.name} のターンです`,
             time: new Date().toISOString()
           });
       }
