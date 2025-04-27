@@ -33,7 +33,7 @@ const CardDeck = ({ drawCard, isDrawable, isGameOver }) => {
       >
         <CardWrapper transform="-translate-x-0.5 top-0 transform rotate-2" isDrawable={isDrawable} />
         <CardWrapper transform="translate-x-0.5 top-0 transform -rotate-2" isDrawable={isDrawable} />
-        <CardWrapper isCenter isDrawable={isDrawable} />
+        <CardWrapper transform="top-0" isCenter isDrawable={isDrawable} />
       </button>
     </div>
   )
