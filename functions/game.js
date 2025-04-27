@@ -35,14 +35,24 @@ class Game {
     if (this.players.every(p => p.cards.length >= 5) || this.deck.size === 0) {
       this.isGameOver = true;
       let highestScore = -1;
-      let winner = null;
+      let winners = [];
+      
+      // 最高得点を見つける
       this.players.forEach(p => {
         if (p.score > highestScore) {
           highestScore = p.score;
-          winner = p.name;
         }
       });
-      this.winner = winner;
+      
+      // 最高得点のプレイヤーを全て集める（同点の場合は複数になる可能性）
+      this.players.forEach(p => {
+        if (p.score === highestScore) {
+          winners.push(p.name);
+        }
+      });
+      
+      // 同点の場合は引き分けとする
+      this.winner = winners.length > 1 ? '引き分け' : winners[0];
     }
 
     this.currentTurn = (this.currentTurn + 1) % this.players.length;
@@ -79,7 +89,8 @@ class Game {
         id: player.id,
         name: player.name,
         seatIndex: player.seatIndex,
-        cards: player.cards
+        cards: player.cards,
+        score: player.score
       })),
       deck: this.deck.cards,
       currentTurn: this.currentTurn,
