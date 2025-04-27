@@ -15,7 +15,7 @@ const OpponentView = ({ playerName, handSize = 0 }) => {
               key={index}
               className="absolute w-16 h-24"
               style={{
-                transform: `translateY(${index * -2}px)`,
+                transform: `translate(${index * 10}px, ${index * -2}px)`,
                 zIndex: handSize - index,
               }}
             >
