@@ -166,9 +166,14 @@ io.on('connection', (socket) => {
       const nextPlayer = game.players[game.currentTurn];
       const now = new Date().toISOString();
       const announcements = [
-          { message: `${drawer.name} がカードを引きました`, time: now },
-          { message: `${nextPlayer.name} のターンです`, time: now }
+          { message: `${drawer.name} がカードを引きました`, time: now }
       ];
+      
+      if (result.isGameOver && result.winner) {
+          announcements.push({ message: `ゲーム終了！ ${result.winner} の勝利です！`, time: now });
+      } else {
+          announcements.push({ message: `${nextPlayer.name} のターンです`, time: now });
+      }
       console.log("✅ Card drawn successfully.");
       const gameState = game.toJSON();
       await saveGameToFirestore(gameState);
