@@ -1,3 +1,4 @@
+
 import Deck from './deck.js';
 
 class Game {
@@ -24,6 +25,43 @@ class Game {
     this.winner = null;
   }
 
+  // プレイヤーをルームに追加
+  addPlayer(socketId, playerName, seatIndex) {
+    if (seatIndex < 0 || seatIndex >= this.players.length) {
+      return false;
+    }
+    
+    const targetSlot = this.players[seatIndex];
+    if (targetSlot.id !== null) {
+      return false;
+    }
+
+    targetSlot.id = socketId;
+    targetSlot.name = playerName;
+    return true;
+  }
+
+  // プレイヤーをルームから削除
+  removePlayer(socketId) {
+    const player = this.players.find(p => p.id === socketId);
+    if (!player) {
+      return false;
+    }
+    
+    player.id = null;
+    return true;
+  }
+
+  // 空席があるかチェック
+  hasEmptySeat() {
+    return this.players.some(player => player.id === null);
+  }
+
+  // アクティブなプレイヤー数を取得
+  getActivePlayerCount() {
+    return this.players.filter(player => player.id !== null).length;
+  }
+
   drawCard(playerIndex) {
     if (this.isGameOver || this.deck.size === 0) return null;
 
@@ -37,21 +75,18 @@ class Game {
       let highestScore = -1;
       let winners = [];
       
-      // 最高得点を見つける
       this.players.forEach(p => {
         if (p.score > highestScore) {
           highestScore = p.score;
         }
       });
       
-      // 最高得点のプレイヤーを全て集める（同点の場合は複数になる可能性）
       this.players.forEach(p => {
         if (p.score === highestScore) {
           winners.push(p.name);
         }
       });
       
-      // 同点の場合は引き分けとする
       this.winner = winners.length > 1 ? '引き分け' : winners[0];
     }
 
