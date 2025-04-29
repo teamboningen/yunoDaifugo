@@ -5,6 +5,8 @@ import CardDeck from './components/CardDeck';
 import PlayerView from './components/PlayerView';
 import OpponentView from './components/OpponentView';
 import GameControls from './components/GameControls';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const App = () => {
   const [players, setPlayers] = useState([]);
@@ -15,12 +17,37 @@ const App = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [isFull, setIsFull] = useState(false);
   const hasJoinedRef = useRef(false);
+  
+  // ルーム管理用の状態
+  const [roomName, setRoomName] = useState('');
+  const [playerName, setPlayerName] = useState('');
+  const [isInRoom, setIsInRoom] = useState(false);
 
   const addAnnouncement = (msg) => {
     setAnnouncements(prev => [msg, ...prev].slice(0, 3));
   };
 
   const getSelfPlayer = () => players.find((p) => 'hand' in p);
+
+  // ルーム作成ハンドラー
+  const handleCreateRoom = () => {
+    if (!roomName || !playerName) return;
+    socket.emit('createRoom', { roomName, playerName });
+  };
+
+  // ルーム参加ハンドラー
+  const handleJoinRoom = () => {
+    if (!roomName || !playerName) return;
+    socket.emit('joinRoom', { roomName, playerName });
+  };
+
+  // ルーム離脱ハンドラー
+  const handleLeaveRoom = () => {
+    socket.emit('leaveRoom');
+    setIsInRoom(false);
+    setRoomName('');
+    setPlayerName('');
+  };
 
   useEffect(() => {
     console.log("🚀 useEffect triggered");
@@ -34,11 +61,6 @@ const App = () => {
 
     socket.on("connect", () => {
       console.log(`✅ Connected! Socket ID: ${socket.id}`);
-      if (!hasJoinedRef.current) {
-        console.log(`📡 Emitting joinGame... (socket.id: ${socket.id})`);
-        socket.emit('joinGame');
-        hasJoinedRef.current = true;
-      }
     });
 
     socket.on("disconnect", (reason) => {
@@ -81,6 +103,18 @@ const App = () => {
       addAnnouncement({ message: `エラー: ${message}`, time: new Date().toISOString() });
     });
 
+    socket.on('roomJoined', () => {
+      console.log('✅ Joined room successfully');
+      setIsInRoom(true);
+      addAnnouncement({ message: `ルーム「${roomName}」に参加しました`, time: new Date().toISOString() });
+    });
+
+    socket.on('roomLeft', () => {
+      console.log('🚪 Left room');
+      setIsInRoom(false);
+      addAnnouncement({ message: 'ルームを退出しました', time: new Date().toISOString() });
+    });
+
     return () => {
       console.log("🔄 Component unmounted or dependencies changed");
       socket.off("connect");
@@ -108,6 +142,35 @@ const App = () => {
   return (
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#1a472a' }}>
       <AnnouncementBar fixedMessage={fixedMessage} messages={announcements} />
+
+      {!isInRoom && (
+        <div className="flex flex-col items-center gap-4 p-4 bg-white/10 m-4 rounded-lg">
+          <Input
+            type="text"
+            placeholder="ルーム名"
+            value={roomName}
+            onChange={(e) => setRoomName(e.target.value)}
+            className="max-w-xs"
+          />
+          <Input
+            type="text"
+            placeholder="プレイヤー名"
+            value={playerName}
+            onChange={(e) => setPlayerName(e.target.value)}
+            className="max-w-xs"
+          />
+          <div className="flex gap-2">
+            <Button onClick={handleCreateRoom}>ルーム作成</Button>
+            <Button onClick={handleJoinRoom}>ルーム参加</Button>
+          </div>
+        </div>
+      )}
+
+      {isInRoom && (
+        <div className="flex justify-end p-4">
+          <Button onClick={handleLeaveRoom} variant="outline">ルーム退出</Button>
+        </div>
+      )}
 
       {isFull ? (
         <div className="full-message">
