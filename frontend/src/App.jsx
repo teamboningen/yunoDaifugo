@@ -143,28 +143,34 @@ const App = () => {
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#1a472a' }}>
       <AnnouncementBar fixedMessage={fixedMessage} messages={announcements} />
 
-      {!isInRoom && (
-        <div className="flex flex-col items-center gap-4 p-4 bg-white/10 m-4 rounded-lg">
-          <Input
-            type="text"
-            placeholder="ルーム名"
-            value={roomName}
-            onChange={(e) => setRoomName(e.target.value)}
-            className="max-w-xs"
-          />
-          <Input
-            type="text"
-            placeholder="プレイヤー名"
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-            className="max-w-xs"
-          />
-          <div className="flex gap-2">
-            <Button onClick={handleCreateRoom}>ルーム作成</Button>
-            <Button onClick={handleJoinRoom}>ルーム参加</Button>
+      <Dialog open={!isInRoom}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>ルーム参加</DialogTitle>
+            <DialogDescription>
+              ルームを作成するか、既存のルームに参加してください
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-4">
+            <Input
+              type="text"
+              placeholder="ルーム名"
+              value={roomName}
+              onChange={(e) => setRoomName(e.target.value)}
+            />
+            <Input
+              type="text"
+              placeholder="プレイヤー名"
+              value={playerName}
+              onChange={(e) => setPlayerName(e.target.value)}
+            />
           </div>
-        </div>
-      )}
+          <DialogFooter>
+            <Button onClick={handleCreateRoom} className="mr-2">ルーム作成</Button>
+            <Button onClick={handleJoinRoom}>ルーム参加</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {isInRoom && (
         <div className="flex justify-end p-4">
