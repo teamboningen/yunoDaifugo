@@ -125,6 +125,9 @@ io.on('connection', (socket) => {
       // ゲーム状態を保存
       await saveGameToFirestore(roomName, game.toJSON());
 
+      // ルーム参加イベントを送信
+      socket.emit('roomJoined');
+
       // 全プレイヤーに更新を通知
       const updatedState = game.toJSON();
       const announcements = [{
