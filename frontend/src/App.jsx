@@ -7,6 +7,14 @@ import OpponentView from './components/OpponentView';
 import GameControls from './components/GameControls';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 const App = () => {
   const [players, setPlayers] = useState([]);
@@ -17,7 +25,7 @@ const App = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [isFull, setIsFull] = useState(false);
   const hasJoinedRef = useRef(false);
-  
+
   // ルーム管理用の状態
   const [roomName, setRoomName] = useState('');
   const [playerName, setPlayerName] = useState('');
