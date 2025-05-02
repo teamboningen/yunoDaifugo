@@ -136,12 +136,16 @@ const App = () => {
 
     socket.on('error', ({ message }) => {
       console.error(`❌ Error received: ${message}`);
+      setError(message);
+      setIsLoading(false);
       addAnnouncement({ message: `エラー: ${message}`, time: new Date().toISOString() });
     });
 
     socket.on('roomJoined', () => {
       console.log('✅ Joined room successfully');
       setIsInRoom(true);
+      setError('');
+      setIsLoading(false);
       addAnnouncement({ message: `ルーム「${roomName}」に参加しました`, time: new Date().toISOString() });
     });
 
