@@ -88,6 +88,9 @@ io.on('connection', (socket) => {
     // ゲーム状態を保存
     await saveGameToFirestore(roomName, game.toJSON());
 
+    // ルーム参加イベントを送信
+    socket.emit('roomJoined');
+
     // ゲーム状態を送信
     socket.emit('gameLoaded', formatGameStateForPlayer(game.toJSON(), socket.id));
   });
