@@ -30,6 +30,8 @@ const App = () => {
   const [roomName, setRoomName] = useState('');
   const [playerName, setPlayerName] = useState('');
   const [isInRoom, setIsInRoom] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Added isLoading state
+  const [error, setError] = useState(''); // Added error state
 
   const addAnnouncement = (msg) => {
     setAnnouncements(prev => [msg, ...prev].slice(0, 3));
@@ -38,15 +40,33 @@ const App = () => {
   const getSelfPlayer = () => players.find((p) => 'hand' in p);
 
   // ルーム作成ハンドラー
-  const handleCreateRoom = () => {
-    if (!roomName || !playerName) return;
-    socket.emit('createRoom', { roomName, playerName });
+  const handleCreateRoom = async () => {
+    setError('');
+    if (!validateInputs()) return;
+
+    setIsLoading(true);
+    try {
+      socket.emit('createRoom', { roomName: roomName.trim(), playerName: playerName.trim() });
+    } catch (err) {
+      setError('ルーム作成に失敗しました');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // ルーム参加ハンドラー
-  const handleJoinRoom = () => {
-    if (!roomName || !playerName) return;
-    socket.emit('joinRoom', { roomName, playerName });
+  const handleJoinRoom = async () => {
+    setError('');
+    if (!validateInputs()) return;
+
+    setIsLoading(true);
+    try {
+      socket.emit('joinRoom', { roomName: roomName.trim(), playerName: playerName.trim() });
+    } catch (err) {
+      setError('ルーム参加に失敗しました');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // ルーム離脱ハンドラー
@@ -55,6 +75,14 @@ const App = () => {
     setIsInRoom(false);
     setRoomName('');
     setPlayerName('');
+  };
+
+  const validateInputs = () => {
+    if (!roomName.trim() || !playerName.trim()) {
+      setError('ルーム名とプレイヤー名は必須です');
+      return false;
+    }
+    return true;
   };
 
   useEffect(() => {
@@ -172,10 +200,15 @@ const App = () => {
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
             />
+            {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
           </div>
           <DialogFooter>
-            <Button onClick={handleCreateRoom} className="mr-2">ルーム作成</Button>
-            <Button onClick={handleJoinRoom}>ルーム参加</Button>
+            <Button onClick={handleCreateRoom} className="mr-2" disabled={isLoading}> {/* Added loading state */}
+              {isLoading ? 'ルーム作成中...' : 'ルーム作成'}
+            </Button>
+            <Button onClick={handleJoinRoom} disabled={isLoading}> {/* Added loading state */}
+              {isLoading ? 'ルーム参加中...' : 'ルーム参加'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
