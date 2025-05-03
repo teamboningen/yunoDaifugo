@@ -62,6 +62,10 @@ async function saveGameToFirestore(roomId, gameState) {
 io.on('connection', (socket) => {
   console.log(`🔗 User connected: ${socket.id}`);
 
+  // roomName のみ保持
+  socket.data.roomName = null;
+
+
   // ルーム作成イベントハンドラー
   socket.on('createRoom', async ({ roomName, playerName }) => {
     console.log(`🎮 createRoom received from ${socket.id}: room=${roomName}, player=${playerName}`);
@@ -84,6 +88,7 @@ io.on('connection', (socket) => {
 
     // ルームに参加
     socket.join(roomName);
+    socket.data.roomName = roomName; // Update roomName in socket.data
 
     // ゲーム状態を保存
     await saveGameToFirestore(roomName, game.toJSON());
@@ -124,6 +129,7 @@ io.on('connection', (socket) => {
 
       // ルームに参加
       socket.join(roomName);
+      socket.data.roomName = roomName; // Update roomName in socket.data
 
       // ゲーム状態を保存
       await saveGameToFirestore(roomName, game.toJSON());
@@ -166,6 +172,7 @@ io.on('connection', (socket) => {
 
       // ルームから退出
       socket.leave(roomName);
+      socket.data.roomName = null; // Update roomName in socket.data
 
       // ゲーム状態を保存
       await saveGameToFirestore(roomName, game.toJSON());
