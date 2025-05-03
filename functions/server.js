@@ -236,13 +236,15 @@ io.on('connection', (socket) => {
       }
       console.log("✅ Card drawn successfully.");
       const gameState = game.toJSON();
-      await saveGameToFirestore(socket.rooms.values().next().value, gameState); // Save to correct room
+      await saveGameToFirestore(socket.data.roomName, gameState);
 
       game.players.forEach(player => {
-        io.to(player.id).emit('gameUpdated', {
-          ...formatGameStateForPlayer(gameState, player.id),
-          announcements
-        });
+        if (player.id) {  // Only emit to connected players
+          io.to(player.id).emit('gameUpdated', {
+            ...formatGameStateForPlayer(gameState, player.id),
+            announcements
+          });
+        }
       });
     } else {
       console.error("❌ Card draw failed.");
