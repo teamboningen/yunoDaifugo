@@ -60,6 +60,7 @@ const App = () => {
     if (!validateInputs()) return;
 
     setIsLoading(true);
+    setIsFull(false); // 満員状態をリセット
     try {
       socket.emit('joinRoom', { roomName: roomName.trim(), playerName: playerName.trim() });
     } catch (err) {
