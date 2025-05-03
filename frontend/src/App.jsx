@@ -185,7 +185,7 @@ const App = () => {
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#1a472a' }}>
       <AnnouncementBar fixedMessage={fixedMessage} messages={announcements} />
 
-      <Dialog open={!isInRoom} onOpenChange={(open) => !open && setIsInRoom(true)} modal={false}>
+      <Dialog open={!isInRoom} modal={false}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>ルーム参加</DialogTitle>
