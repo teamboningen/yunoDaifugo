@@ -198,7 +198,7 @@ io.on('connection', (socket) => {
   socket.on('drawCard', async () => {
     console.log(`🎴 drawCard received from: ${socket.id}`);
 
-    const currentGameState = await loadGameFromFirestore(socket.rooms.values().next().value); // Get room name from socket.rooms
+    const currentGameState = await loadGameFromFirestore(socket.data.roomName);
     if (!currentGameState) return;
 
     const game = new Game();
@@ -252,7 +252,7 @@ io.on('connection', (socket) => {
 
   socket.on('resetGame', async () => {
     console.log('🔄 Game reset requested by:', socket.id);
-    const roomName = socket.rooms.values().next().value; // Get room name from socket.rooms
+    const roomName = socket.data.roomName;
     const currentGameState = await loadGameFromFirestore(roomName);
     const game = new Game();
 
@@ -282,7 +282,7 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', async () => {
     console.log(`🔌 User disconnected: ${socket.id}`);
-    const roomName = [...socket.rooms][1]; //Get room name, index 0 is socket.id itself
+    const roomName = socket.data.roomName;
 
     if(roomName){
       const currentGameState = await loadGameFromFirestore(roomName);
