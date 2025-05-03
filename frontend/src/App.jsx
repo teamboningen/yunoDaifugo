@@ -106,6 +106,7 @@ const App = () => {
     socket.on("gameFull", () => {
       console.warn("🚫 Game is full. You cannot join.");
       setIsFull(true);
+      setIsInRoom(true); // モーダルを閉じる
     });
 
     socket.on('gameLoaded', (data) => {
