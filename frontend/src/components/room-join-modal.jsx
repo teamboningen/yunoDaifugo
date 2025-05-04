@@ -161,11 +161,16 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
           </div>
         </div>
 
-        <DialogFooter className="sm:justify-between">
-          <Button variant="outline" onClick={handleJoinRoom} disabled={isLoading} className="w-full sm:w-auto">
+        <DialogFooter className="flex-col gap-3 sm:gap-0">
+          <Button 
+            variant="outline" 
+            onClick={handleJoinRoom} 
+            disabled={isLoading} 
+            className="w-full h-11"
+          >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 参加中...
               </>
             ) : (
@@ -173,10 +178,14 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
             )}
           </Button>
 
-          <Button onClick={handleCreateRoom} disabled={isLoading} className="w-full sm:w-auto mt-2 sm:mt-0">
+          <Button 
+            onClick={handleCreateRoom} 
+            disabled={isLoading} 
+            className="w-full h-11"
+          >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 作成中...
               </>
             ) : (
