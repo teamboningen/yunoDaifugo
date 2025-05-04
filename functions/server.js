@@ -178,10 +178,11 @@ io.on('connection', (socket) => {
       await saveGameToFirestore(roomName, game.toJSON());
 
       // 残りのプレイヤーに通知
-      const announcements = [{
+      const announcements = game.announcements || [];
+      announcements.push({
         message: `${playerName} が退出しました`,
         time: new Date().toISOString()
-      }];
+      });
 
       game.players.forEach(player => {
         if (player.id) {

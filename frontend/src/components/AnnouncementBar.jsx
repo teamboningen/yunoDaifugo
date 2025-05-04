@@ -31,7 +31,7 @@ const AnnouncementBar = ({ fixedMessage, messages }) => {
         className="h-[135px] overflow-y-auto scroll-smooth w-full max-w-[600px] px-1 py-1 rounded-md"
       >
         <ul className="flex flex-col gap-2 w-full">
-          {messages.slice(0, 3).map((msg, index) => (
+          {messages.slice(-3).map((msg, index) => (
             <li key={index}>
               <Alert className="bg-white shadow-sm w-full">
                 <div className="flex justify-between items-center w-full">
