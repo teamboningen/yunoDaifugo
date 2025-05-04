@@ -5,16 +5,8 @@ import CardDeck from './components/CardDeck';
 import PlayerView from './components/PlayerView';
 import OpponentView from './components/OpponentView';
 import GameControls from './components/GameControls';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import RoomJoinModal from './components/room-join-modal';
 
 const App = () => {
   const [players, setPlayers] = useState([]);
@@ -185,39 +177,12 @@ const App = () => {
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#1a472a' }}>
       <AnnouncementBar fixedMessage={fixedMessage} messages={announcements} />
 
-      <Dialog open={!isInRoom} modal={false}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>ルーム参加</DialogTitle>
-            <DialogDescription>
-              ルームを作成するか、既存のルームに参加してください
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-4 py-4">
-            <Input
-              type="text"
-              placeholder="ルーム名"
-              value={roomName}
-              onChange={(e) => setRoomName(e.target.value)}
-            />
-            <Input
-              type="text"
-              placeholder="プレイヤー名"
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-            />
-            {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
-          </div>
-          <DialogFooter>
-            <Button onClick={handleCreateRoom} className="mr-2" disabled={isLoading}> {/* Added loading state */}
-              {isLoading ? 'ルーム作成中...' : 'ルーム作成'}
-            </Button>
-            <Button onClick={handleJoinRoom} disabled={isLoading}> {/* Added loading state */}
-              {isLoading ? 'ルーム参加中...' : 'ルーム参加'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <RoomJoinModal 
+        isOpen={!isInRoom} 
+        isInRoom={isInRoom}
+        onCreateRoom={handleCreateRoom}
+        onJoinRoom={handleJoinRoom}
+      />
 
       {isInRoom && (
         <div className="flex justify-end p-4">
