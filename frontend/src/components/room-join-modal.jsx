@@ -53,9 +53,10 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
 
     setIsLoading(true);
     try {
-      onCreateRoom(roomName.trim(), playerName.trim());
+      await onCreateRoom({ roomName: roomName.trim(), playerName: playerName.trim() });
     } catch (err) {
       setError("ルーム作成に失敗しました");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -65,9 +66,10 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
 
     setIsLoading(true);
     try {
-      onJoinRoom(roomName.trim(), playerName.trim());
+      await onJoinRoom({ roomName: roomName.trim(), playerName: playerName.trim() });
     } catch (err) {
       setError("ルーム参加に失敗しました");
+    } finally {
       setIsLoading(false);
     }
   };
