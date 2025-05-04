@@ -48,30 +48,26 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
     return isValid;
   };
 
-  const handleCreateRoom = async () => {
+  const handleCreateRoom = () => {
     if (!validateInputs()) return;
 
     setIsLoading(true);
-    try {
-      await onCreateRoom({ roomName: roomName.trim(), playerName: playerName.trim() });
-    } catch (err) {
-      setError("ルーム作成に失敗しました");
-    } finally {
-      setIsLoading(false);
-    }
+    setError("");
+    onCreateRoom({ roomName: roomName.trim(), playerName: playerName.trim() })
+      .catch(err => {
+        setError("ルーム作成に失敗しました");
+      });
   };
 
-  const handleJoinRoom = async () => {
+  const handleJoinRoom = () => {
     if (!validateInputs()) return;
 
     setIsLoading(true);
-    try {
-      await onJoinRoom({ roomName: roomName.trim(), playerName: playerName.trim() });
-    } catch (err) {
-      setError("ルーム参加に失敗しました");
-    } finally {
-      setIsLoading(false);
-    }
+    setError("");
+    onJoinRoom({ roomName: roomName.trim(), playerName: playerName.trim() })
+      .catch(err => {
+        setError("ルーム参加に失敗しました");
+      });
   };
 
   const handleRoomNameChange = (e) => {
