@@ -1,3 +1,4 @@
+
 {
   "name": "nodejs",
   "version": "1.0.0",
@@ -10,10 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@radix-ui/react-dialog": "^1.1.11",
-    "@radix-ui/react-label": "^2.1.4",
-    "@types/node": "^18.0.6",
-    "lucide-react": "^0.507.0"
+    "@types/node": "^18.0.6"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
