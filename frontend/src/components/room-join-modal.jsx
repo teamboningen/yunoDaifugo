@@ -161,12 +161,12 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
           </div>
         </div>
 
-        <DialogFooter className="flex-col gap-3 sm:gap-0">
+        <DialogFooter className="flex-col gap-3 sm:gap-0 mx-auto w-[80%]">
           <Button 
             variant="outline" 
             onClick={handleJoinRoom} 
             disabled={isLoading} 
-            className="w-full h-11"
+            className="h-11 bg-gray-800 hover:bg-gray-700 text-white border-gray-700"
           >
             {isLoading ? (
               <>
@@ -181,7 +181,7 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
           <Button 
             onClick={handleCreateRoom} 
             disabled={isLoading} 
-            className="w-full h-11"
+            className="h-11 bg-gray-800 hover:bg-gray-700 text-white border-gray-700"
           >
             {isLoading ? (
               <>
