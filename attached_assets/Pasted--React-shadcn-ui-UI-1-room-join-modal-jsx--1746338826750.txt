@@ -1,0 +1,489 @@
+以下のファイルを作成または更新してください。これはReactとshadcn/uiを使用したルーム参加モーダルUIの改善です。
+
+1. まず、新しいファイル「room-join-modal.jsx」を作成してください:
+
+```jsx
+import React, { useState, useEffect } from "react";
+import { Check, Loader2, Users, X } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Label } from "@/components/ui/label";
+
+export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRoom }) {
+  const [roomName, setRoomName] = useState("");
+  const [playerName, setPlayerName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // フォームバリデーション状態
+  const [roomNameError, setRoomNameError] = useState(false);
+  const [playerNameError, setPlayerNameError] = useState(false);
+
+  // 入力フィールドのバリデーション
+  const validateInputs = () => {
+    let isValid = true;
+
+    if (!roomName.trim()) {
+      setRoomNameError(true);
+      isValid = false;
+    } else {
+      setRoomNameError(false);
+    }
+
+    if (!playerName.trim()) {
+      setPlayerNameError(true);
+      isValid = false;
+    } else {
+      setPlayerNameError(false);
+    }
+
+    if (!isValid) {
+      setError("ルーム名とプレイヤー名は必須です");
+    } else {
+      setError("");
+    }
+
+    return isValid;
+  };
+
+  // ルーム作成ハンドラー
+  const handleCreateRoom = async () => {
+    if (!validateInputs()) return;
+
+    setIsLoading(true);
+    try {
+      onCreateRoom(roomName.trim(), playerName.trim());
+    } catch (err) {
+      setError("ルーム作成に失敗しました");
+      setIsLoading(false);
+    }
+  };
+
+  // ルーム参加ハンドラー
+  const handleJoinRoom = async () => {
+    if (!validateInputs()) return;
+
+    setIsLoading(true);
+    try {
+      onJoinRoom(roomName.trim(), playerName.trim());
+    } catch (err) {
+      setError("ルーム参加に失敗しました");
+      setIsLoading(false);
+    }
+  };
+
+  // 入力フィールドの変更時にエラー状態をリセット
+  const handleRoomNameChange = (e) => {
+    setRoomName(e.target.value);
+    if (e.target.value.trim()) {
+      setRoomNameError(false);
+    }
+    if (error) setError("");
+  };
+
+  const handlePlayerNameChange = (e) => {
+    setPlayerName(e.target.value);
+    if (e.target.value.trim()) {
+      setPlayerNameError(false);
+    }
+    if (error) setError("");
+  };
+
+  // エスケープキーでのモーダルクローズを防止
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && isOpen && !isInRoom) {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, isInRoom]);
+
+  return (
+    <Dialog open={isOpen && !isInRoom} modal={true}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-xl">
+            <Users className="h-5 w-5" />
+            ルーム参加
+          </DialogTitle>
+          <DialogDescription>ルームを作成するか、既存のルームに参加してください</DialogDescription>
+        </DialogHeader>
+
+        <div className="flex flex-col gap-5 py-4">
+          {error && (
+            <Alert variant="destructive" className="animate-shake">
+              <AlertDescription className="flex items-center gap-2">
+                <X className="h-4 w-4" />
+                {error}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="roomName" className="text-sm font-medium">
+              ルーム名
+            </Label>
+            <div className="relative">
+              <Input
+                id="roomName"
+                type="text"
+                placeholder="ルーム名を入力"
+                value={roomName}
+                onChange={handleRoomNameChange}
+                className={`pr-8 ${roomNameError ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                disabled={isLoading}
+              />
+              {roomName && !roomNameError && <Check className="absolute right-3 top-2.5 h-4 w-4 text-green-500" />}
+              {roomNameError && <X className="absolute right-3 top-2.5 h-4 w-4 text-red-500" />}
+            </div>
+            {roomNameError && <p className="text-xs text-red-500 mt-1">ルーム名を入力してください</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="playerName" className="text-sm font-medium">
+              プレイヤー名
+            </Label>
+            <div className="relative">
+              <Input
+                id="playerName"
+                type="text"
+                placeholder="プレイヤー名を入力"
+                value={playerName}
+                onChange={handlePlayerNameChange}
+                className={`pr-8 ${playerNameError ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                disabled={isLoading}
+              />
+              {playerName && !playerNameError && <Check className="absolute right-3 top-2.5 h-4 w-4 text-green-500" />}
+              {playerNameError && <X className="absolute right-3 top-2.5 h-4 w-4 text-red-500" />}
+            </div>
+            {playerNameError && <p className="text-xs text-red-500 mt-1">プレイヤー名を入力してください</p>}
+          </div>
+        </div>
+
+        <DialogFooter className="sm:justify-between">
+          <Button variant="outline" onClick={handleJoinRoom} disabled={isLoading} className="w-full sm:w-auto">
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                参加中...
+              </>
+            ) : (
+              "既存ルームに参加"
+            )}
+          </Button>
+
+          <Button onClick={handleCreateRoom} disabled={isLoading} className="w-full sm:w-auto mt-2 sm:mt-0">
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                作成中...
+              </>
+            ) : (
+              "新規ルームを作成"
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+2. 次に、既存のApp.jsxファイルを更新してください:
+
+```jsx
+import React, { useEffect, useState, useRef } from 'react';
+import socket from './socket';
+import AnnouncementBar from './components/AnnouncementBar';
+import CardDeck from './components/CardDeck';
+import PlayerView from './components/PlayerView';
+import OpponentView from './components/OpponentView';
+import GameControls from './components/GameControls';
+import RoomJoinModal from './components/room-join-modal';
+import { Button } from '@/components/ui/button';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
+const App = () => {
+  const [players, setPlayers] = useState([]);
+  const [deckSize, setDeckSize] = useState(0);
+  const [currentTurn, setCurrentTurn] = useState(0);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [winner, setWinner] = useState(null);
+  const [announcements, setAnnouncements] = useState([]);
+  const [isFull, setIsFull] = useState(false);
+  const hasJoinedRef = useRef(false);
+  const [hand, setHand] = useState([]); // Declare hand state
+
+  // ルーム管理用の状態
+  const [roomName, setRoomName] = useState('');
+  const [playerName, setPlayerName] = useState('');
+  const [isInRoom, setIsInRoom] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const addAnnouncement = (msg) => {
+    setAnnouncements(prev => [msg, ...prev].slice(0, 3));
+  };
+
+  const getSelfPlayer = () => players.find((p) => 'hand' in p);
+
+  // ルーム作成ハンドラー
+  const handleCreateRoom = async (roomName, playerName) => {
+    setRoomName(roomName);
+    setPlayerName(playerName);
+    setError('');
+    setIsLoading(true);
+
+    try {
+      socket.emit('createRoom', { roomName, playerName });
+    } catch (err) {
+      setError('ルーム作成に失敗しました');
+      setIsLoading(false);
+    }
+  };
+
+  // ルーム参加ハンドラー
+  const handleJoinRoom = async (roomName, playerName) => {
+    setRoomName(roomName);
+    setPlayerName(playerName);
+    setError('');
+    setIsLoading(true);
+    setIsFull(false); // 満員状態をリセット
+
+    try {
+      socket.emit('joinRoom', { roomName, playerName });
+    } catch (err) {
+      setError('ルーム参加に失敗しました');
+      setIsLoading(false);
+    }
+  };
+
+  // ルーム離脱ハンドラー
+  const handleLeaveRoom = () => {
+    socket.emit('leaveRoom');
+    setIsInRoom(false);
+    setRoomName('');
+    setPlayerName('');
+  };
+
+  useEffect(() => {
+    console.log("🚀 useEffect triggered");
+
+    if (!socket.connected) {
+      console.log("🔌 Calling socket.connect()...");
+      socket.connect();
+    } else {
+      console.log(`🆔 Already connected. Socket ID: ${socket.id}`);
+    }
+
+    socket.on("connect", () => {
+      console.log(`✅ Connected! Socket ID: ${socket.id}`);
+    });
+
+    socket.on("disconnect", (reason) => {
+      console.warn(`⚠️ Disconnected: ${reason}`);
+    });
+
+    socket.on("gameFull", () => {
+      console.warn("🚫 Game is full. You cannot join.");
+      setIsFull(true);
+      setIsInRoom(true); // モーダルを閉じる
+      setIsLoading(false);
+    });
+
+    socket.on('gameLoaded', (data) => {
+      console.log("📩 gameLoaded received", data);
+      setPlayers(data.players);
+      setDeckSize(data.deck.length);
+      setCurrentTurn(data.currentTurn);
+      setIsGameOver(data.isGameOver);
+      setWinner(data.winner || null);
+      addAnnouncement({ 
+        message: `現在のターン: ${data.players[data.currentTurn]?.name || '不明'}`, 
+        time: new Date().toISOString() 
+      });
+    });
+
+    socket.on('gameUpdated', (data) => {
+      console.log('📩 gameUpdated received', data);
+      setPlayers(data.players);
+      setDeckSize(data.deck.length);
+      setCurrentTurn(data.currentTurn);
+      setIsGameOver(data.isGameOver);
+      setWinner(data.winner || null);
+      const self = data.players.find(p => p.id === socket.id);
+      if (self?.hand) {
+        setHand(self.hand);
+      }
+      if (Array.isArray(data.announcements)) {
+        setAnnouncements(prev => [...data.announcements, ...prev].slice(0, 3));
+      }
+    });
+
+    socket.on('error', ({ message }) => {
+      console.error(`❌ Error received: ${message}`);
+      setError(message);
+      setIsLoading(false);
+      addAnnouncement({ message: `エラー: ${message}`, time: new Date().toISOString() });
+    });
+
+    socket.on('roomJoined', () => {
+      console.log('✅ Joined room successfully');
+      setIsInRoom(true);
+      setError('');
+      setIsLoading(false);
+      addAnnouncement({ message: `ルーム「${roomName}」に参加しました`, time: new Date().toISOString() });
+    });
+
+    socket.on('roomLeft', () => {
+      console.log('🚪 Left room');
+      setIsInRoom(false);
+      addAnnouncement({ message: 'ルームを退出しました', time: new Date().toISOString() });
+    });
+
+    return () => {
+      console.log("🔄 Component unmounted or dependencies changed");
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.off("gameFull");
+      socket.off('gameLoaded');
+      socket.off('gameUpdated');
+      socket.off('error');
+    };
+  }, []);
+
+  const drawCard = () => {
+    if (deckSize > 0 && !isGameOver) {
+      console.log("🃏 Emitting drawCard...");
+      socket.emit('drawCard');
+    }
+  };
+
+  const selfPlayer = getSelfPlayer();
+  const fixedMessage = selfPlayer ? `あなたは ${selfPlayer.name} です` : '';
+  const isDrawable = getSelfPlayer()?.seatIndex === currentTurn;
+  console.log('isDrawable:', isDrawable);
+  const otherPlayers = players.filter((p) => !('hand' in p)).sort((a, b) => a.seatIndex - b.seatIndex);
+
+  return (
+    <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#1a472a' }}>
+      <AnnouncementBar fixedMessage={fixedMessage} messages={announcements} />
+
+      <RoomJoinModal isOpen={true} isInRoom={isInRoom} onCreateRoom={handleCreateRoom} onJoinRoom={handleJoinRoom} />
+
+      {isInRoom && (
+        <div className="flex justify-end p-4">
+          <Button onClick={handleLeaveRoom} variant="outline" className="bg-white/10 hover:bg-white/20 text-white">
+            ルーム退出
+          </Button>
+        </div>
+      )}
+
+      {isFull ? (
+        <div className="p-4 max-w-md mx-auto mt-8">
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>ゲームは満員です</AlertTitle>
+            <AlertDescription>
+              他のプレイヤーが退出するのをお待ちください。
+              <Button onClick={() => window.location.reload()} variant="outline" className="w-full mt-4">
+                再試行
+              </Button>
+            </AlertDescription>
+          </Alert>
+        </div>
+      ) : (
+        <main className="flex flex-col flex-grow justify-between items-stretch w-full" style={{ backgroundColor: '#1a472a' }}>
+          {otherPlayers.map((player) => (
+            <OpponentView
+              key={player.seatIndex}
+              playerName={player.name}
+              handSize={player.handSize ?? 0}
+            />
+          ))}
+
+          <CardDeck drawCard={drawCard} isGameOver={isGameOver} isDrawable={isDrawable} />
+
+          {selfPlayer && (
+            <footer className="w-full">
+              <PlayerView
+                key={selfPlayer.seatIndex}
+                playerName={selfPlayer.name || 'あなた'}
+                cards={selfPlayer.hand}
+              />
+            </footer>
+          )}
+        </main>
+      )}
+
+      <GameControls resetGame={() => socket.emit('resetGame')} />
+    </div>
+  );
+};
+
+export default App;
+```
+
+3. 最後に、index.cssに以下のスタイルを追加してください:
+
+```css
+/* アニメーション */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* テーマカラーの更新 */
+:root {
+  --primary: 142 72% 29%; /* 緑色のテーマカラー */
+  --accent: 142 72% 29%; /* アクセントカラー */
+  --ring: 142 72% 29%; /* フォーカスリングの色 */
+}
+
+.dark {
+  --primary: 142 72% 29%; /* 緑色のテーマカラー */
+  --accent: 142 72% 29%; /* アクセントカラー */
+  --ring: 142 72% 29%; /* フォーカスリングの色 */
+}
+```
+
+これらの変更により、ルーム参加モーダルUIが大幅に改善され、以下の要件を満たします：
+1. シンプルでモダンな見た目
+2. エラー表示を目立つように
+3. ボタンの配置を最適化
+4. 入力フィールドのバリデーション
+5. ローディング状態の視覚的フィードバック
+
+変更を適用した後、アプリケーションを実行して動作確認してください。
