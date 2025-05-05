@@ -32,34 +32,45 @@ const App = () => {
   const getSelfPlayer = () => players.find((p) => 'hand' in p);
 
   // ルーム作成ハンドラー
-  const handleCreateRoom = async () => {
-    setError('');
-    if (!validateInputs()) return;
+  const handleCreateRoom = ({ roomName, playerName }) => {
+    return new Promise((resolve, reject) => {
+      socket.emit('createRoom', { roomName, playerName });
+      
+      const timeoutId = setTimeout(() => {
+        reject(new Error('タイムアウトしました'));
+      }, 5000);
 
-    setIsLoading(true);
-    try {
-      socket.emit('createRoom', { roomName: roomName.trim(), playerName: playerName.trim() });
-    } catch (err) {
-      setError('ルーム作成に失敗しました');
-    } finally {
-      setIsLoading(false);
-    }
+      socket.once('roomJoined', () => {
+        clearTimeout(timeoutId);
+        resolve();
+      });
+
+      socket.once('error', (error) => {
+        clearTimeout(timeoutId);
+        reject(error);
+      });
+    });
   };
 
   // ルーム参加ハンドラー
-  const handleJoinRoom = async () => {
-    setError('');
-    if (!validateInputs()) return;
+  const handleJoinRoom = ({ roomName, playerName }) => {
+    return new Promise((resolve, reject) => {
+      socket.emit('joinRoom', { roomName, playerName });
+      
+      const timeoutId = setTimeout(() => {
+        reject(new Error('タイムアウトしました'));
+      }, 5000);
 
-    setIsLoading(true);
-    setIsFull(false); // 満員状態をリセット
-    try {
-      socket.emit('joinRoom', { roomName: roomName.trim(), playerName: playerName.trim() });
-    } catch (err) {
-      setError('ルーム参加に失敗しました');
-    } finally {
-      setIsLoading(false);
-    }
+      socket.once('roomJoined', () => {
+        clearTimeout(timeoutId);
+        resolve();
+      });
+
+      socket.once('error', (error) => {
+        clearTimeout(timeoutId);
+        reject(error);
+      });
+    });
   };
 
   // ルーム離脱ハンドラー
