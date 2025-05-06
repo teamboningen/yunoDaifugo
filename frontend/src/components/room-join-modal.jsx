@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Check, Loader2, Users, X } from 'lucide-react';
 import {
@@ -48,26 +47,36 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
     return isValid;
   };
 
-  const handleCreateRoom = () => {
+  const handleJoinRoom = async () => {
     if (!validateInputs()) return;
 
     setIsLoading(true);
     setError("");
-    onCreateRoom({ roomName: roomName.trim(), playerName: playerName.trim() })
-      .catch(err => {
-        setError("ルーム作成に失敗しました");
-      });
+    try {
+      await onJoinRoom({ roomName: roomName.trim(), playerName: playerName.trim() });
+      setRoomName("");
+      setPlayerName("");
+    } catch (err) {
+      setError("ルーム参加に失敗しました");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleJoinRoom = () => {
+  const handleCreateRoom = async () => {
     if (!validateInputs()) return;
 
     setIsLoading(true);
     setError("");
-    onJoinRoom({ roomName: roomName.trim(), playerName: playerName.trim() })
-      .catch(err => {
-        setError("ルーム参加に失敗しました");
-      });
+    try {
+      await onCreateRoom({ roomName: roomName.trim(), playerName: playerName.trim() });
+      setRoomName("");
+      setPlayerName("");
+    } catch (err) {
+      setError("ルーム作成に失敗しました");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRoomNameChange = (e) => {
