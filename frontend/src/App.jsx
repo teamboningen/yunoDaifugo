@@ -32,9 +32,9 @@ const App = () => {
   const getSelfPlayer = () => players.find((p) => 'hand' in p);
 
   // ルーム作成ハンドラー
-  const handleCreateRoom = ({ roomName, playerName }) => {
+  const handleCreateRoom = ({ roomName: newRoomName, playerName: newPlayerName }) => {
     return new Promise((resolve, reject) => {
-      socket.emit('createRoom', { roomName, playerName });
+      socket.emit('createRoom', { roomName: newRoomName, playerName: newPlayerName });
       
       const timeoutId = setTimeout(() => {
         reject(new Error('タイムアウトしました'));
@@ -42,6 +42,8 @@ const App = () => {
 
       socket.once('roomJoined', () => {
         clearTimeout(timeoutId);
+        setRoomName(newRoomName);
+        setPlayerName(newPlayerName);
         resolve();
       });
 
@@ -53,9 +55,9 @@ const App = () => {
   };
 
   // ルーム参加ハンドラー
-  const handleJoinRoom = ({ roomName, playerName }) => {
+  const handleJoinRoom = ({ roomName: newRoomName, playerName: newPlayerName }) => {
     return new Promise((resolve, reject) => {
-      socket.emit('joinRoom', { roomName, playerName });
+      socket.emit('joinRoom', { roomName: newRoomName, playerName: newPlayerName });
       
       const timeoutId = setTimeout(() => {
         reject(new Error('タイムアウトしました'));
@@ -63,6 +65,8 @@ const App = () => {
 
       socket.once('roomJoined', () => {
         clearTimeout(timeoutId);
+        setRoomName(newRoomName);
+        setPlayerName(newPlayerName);
         resolve();
       });
 
