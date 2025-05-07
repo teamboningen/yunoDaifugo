@@ -176,10 +176,13 @@ const App = () => {
   }, []);
 
   const drawCard = () => {
-    if (deckSize > 0 && !isGameOver) {
-      console.log("🃏 Emitting drawCard...");
-      socket.emit('drawCard');
-    }
+    return new Promise((resolve) => {
+      if (deckSize > 0 && !isGameOver) {
+        console.log("🃏 Emitting drawCard...");
+        socket.emit('drawCard');
+        socket.once('gameUpdated', () => resolve());
+      }
+    });
   };
 
   const selfPlayer = getSelfPlayer();
