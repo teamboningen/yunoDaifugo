@@ -13,7 +13,7 @@ const AnnouncementBar = ({ fixedMessage, messages }) => {
   useEffect(() => {
     const el = containerRef.current
     if (el) {
-      el.scrollTop = el.scrollHeight // 常に最新（最下部）を表示
+      el.scrollTop = 0 // 常に最上部を表示
     }
   }, [messages])
 
