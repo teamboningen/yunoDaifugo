@@ -134,10 +134,6 @@ const App = () => {
       setCurrentTurn(data.currentTurn);
       setIsGameOver(data.isGameOver);
       setWinner(data.winner || null);
-      const self = data.players.find(p => p.id === socket.id);
-      if (self?.hand) {
-        setHand(self.hand);
-      }
       if (Array.isArray(data.announcements)) {
         setAnnouncements(prev => [...data.announcements, ...prev].slice(0, 3));
       }
@@ -201,6 +197,8 @@ const App = () => {
         isInRoom={isInRoom}
         onCreateRoom={handleCreateRoom}
         onJoinRoom={handleJoinRoom}
+        error={error}
+        isLoading={isLoading}
       />
 
       {isInRoom && (
