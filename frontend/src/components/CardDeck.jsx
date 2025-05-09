@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card'
 import CardBackSVG from './CardBackSVG'
 import { cn } from '@/lib/utils'
@@ -27,7 +27,7 @@ const CardDeck = ({ drawCard, isDrawable, isGameOver }) => {
   const handleDrawCard = async () => {
     if (!isDrawable || isDrawing) return;
     setIsDrawing(true);
-    
+
     try {
       await drawCard();
       setShowSuccess(true);
