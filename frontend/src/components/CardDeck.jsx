@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card'
 import CardBackSVG from './CardBackSVG'
 import { cn } from '@/lib/utils'
 
-const CardWrapper = ({ transform = '', isCenter = false, isDrawable }) => (
+const CardWrapper = ({ transform = '', isCenter = false, isDrawable, isDrawing, showSuccess }) => (
   <div className={cn("absolute w-16 h-24", transform)}>
     <Card
       className={cn(
@@ -49,9 +49,9 @@ const CardDeck = ({ drawCard, isDrawable, isGameOver }) => {
           !isDrawable && "opacity-50 cursor-not-allowed"
         )}
       >
-        <CardWrapper transform="-translate-x-0.5 top-0 transform rotate-2" isDrawable={isDrawable} />
-        <CardWrapper transform="translate-x-0.5 top-0 transform -rotate-2" isDrawable={isDrawable} />
-        <CardWrapper transform="top-0" isCenter isDrawable={isDrawable} />
+        <CardWrapper transform="-translate-x-0.5 top-0 transform rotate-2" isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
+        <CardWrapper transform="translate-x-0.5 top-0 transform -rotate-2" isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
+        <CardWrapper transform="top-0" isCenter isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
       </button>
     </div>
   )
