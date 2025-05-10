@@ -83,6 +83,8 @@ const App = () => {
     setIsInRoom(false);
     setRoomName('');
     setPlayerName('');
+    setError(''); // エラー状態をリセット
+    setIsLoading(false); // ローディング状態をリセット
   };
 
   const validateInputs = () => {
