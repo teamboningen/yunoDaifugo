@@ -146,6 +146,13 @@ const App = () => {
       setError(message);
       setIsLoading(false);
       addAnnouncement({ message: `エラー: ${message}`, time: new Date().toISOString() });
+      
+      // ルーム情報関連のエラーの場合、ルーム状態をリセット
+      if (message.includes('ルーム情報') || message.includes('ルームが見つかり')) {
+        setIsInRoom(false);
+        setRoomName('');
+        setPlayerName('');
+      }
     });
 
     socket.on('roomJoined', () => {

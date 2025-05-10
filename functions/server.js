@@ -204,8 +204,15 @@ io.on('connection', (socket) => {
   // 以下は既存のイベントハンドラー
   socket.on('drawCard', async () => {
     console.log(`🎴 drawCard received from: ${socket.id}`);
+    
+    const roomName = socket.data.roomName;
+    if (!roomName) {
+      console.log(`🎴 drawCard received from ${socket.id}, but no room name found in socket.data`);
+      socket.emit('error', { message: 'ルーム情報が見つかりません。' });
+      return;
+    }
 
-    const currentGameState = await loadGameFromFirestore(socket.data.roomName);
+    const currentGameState = await loadGameFromFirestore(roomName);
     if (!currentGameState) return;
 
     const game = new Game();
@@ -262,6 +269,12 @@ io.on('connection', (socket) => {
   socket.on('resetGame', async () => {
     console.log('🔄 Game reset requested by:', socket.id);
     const roomName = socket.data.roomName;
+    if (!roomName) {
+      console.log(`🔄 resetGame received from ${socket.id}, but no room name found in socket.data`);
+      socket.emit('error', { message: 'ルーム情報が見つかりません。' });
+      return;
+    }
+    
     const currentGameState = await loadGameFromFirestore(roomName);
     const game = new Game();
 
@@ -293,7 +306,8 @@ io.on('connection', (socket) => {
     console.log(`🔌 User disconnected: ${socket.id}`);
     const roomName = socket.data.roomName;
 
-    if(roomName){
+    if (roomName) {
+      console.log(`🔌 User disconnected from room: ${roomName}`);
       const currentGameState = await loadGameFromFirestore(roomName);
       if (!currentGameState) return;
 
