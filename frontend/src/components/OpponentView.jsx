@@ -10,7 +10,7 @@ const OpponentView = ({ playerName, handSize = 0 }) => {
       </div>
       <div className="flex justify-center">
         <div className="relative w-16 h-24">
-          {Array.from({ length: handSize }).map((_, index) => (
+          {Array.from({ length: Math.max(0, handSize) }).map((_, index) => (
             <div
               key={index}
               className="absolute w-16 h-24"

@@ -169,6 +169,8 @@ const App = () => {
       socket.off('gameLoaded');
       socket.off('gameUpdated');
       socket.off('error');
+      socket.off('roomJoined');
+      socket.off('roomLeft');
     };
   }, []);
 

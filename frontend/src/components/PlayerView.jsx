@@ -13,7 +13,7 @@ const PlayerView = ({ cards = [], playerName }) => {
     <div className="my-4 px-4">
       <h2 className="text-lg font-semibold mb-2">{playerName}の手札: {cards.length}枚</h2>
       <div className="flex overflow-x-auto space-x-2 pb-2">
-        {cards.map((card, index) => {
+        {Array.isArray(cards) && cards.map((card, index) => {
           const isRed = card.suit === 'Hearts' || card.suit === 'Diamonds';
           const suitSymbol = suitMap[card.suit] || card.suit;
           return (
