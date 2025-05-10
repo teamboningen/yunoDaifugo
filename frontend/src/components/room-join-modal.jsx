@@ -204,3 +204,5 @@ const RoomJoinModal = ({ isOpen, isInRoom, onCreateRoom, onJoinRoom, error, isLo
     </Dialog>
   );
 }
+
+export default RoomJoinModal;
