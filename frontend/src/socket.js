@@ -1,11 +1,9 @@
+import { io } from "socket.io-client";
 
-import { io } from 'socket.io-client';
-
-// 開発環境ではlocalhost、本番環境ではサーバーのURLを使用
-const URL = import.meta.env.PROD 
-  ? window.location.origin 
-  : 'http://localhost:3001';
-
-const socket = io(URL);
+                  const socket = io(import.meta.env.VITE_BACKEND_URL || 'https://sufficient-tiffani-teamboningen-58a55eb3.koyeb.app', {
+  autoConnect: false, // 明示的に接続
+  reconnectionAttempts: 3, // 最大3回まで再接続
+  reconnectionDelay: 1000, // 再接続の間隔
+});
 
 export default socket;
