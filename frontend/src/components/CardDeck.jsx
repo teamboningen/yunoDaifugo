@@ -42,7 +42,7 @@ const CardDeck = ({ drawCard, isDrawable, isGameOver }) => {
   if (isGameOver) return null;
 
   return (
-    <div className="flex justify-center my-4">
+    
       <button
         onClick={handleDrawCard}
         disabled={!isDrawable || isDrawing}
@@ -55,7 +55,7 @@ const CardDeck = ({ drawCard, isDrawable, isGameOver }) => {
         <CardWrapper transform="translate-x-0.5 top-0 transform -rotate-2" isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
         <CardWrapper transform="top-0" isCenter isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
       </button>
-    </div>
+    
   )
 }
 
