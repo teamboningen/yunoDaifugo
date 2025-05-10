@@ -13,15 +13,15 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 
-export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRoom }) {
+const RoomJoinModal = ({ isOpen, isInRoom, onCreateRoom, onJoinRoom, error, isLoading, validateInputs }) => {
   const [roomName, setRoomName] = useState("");
   const [playerName, setPlayerName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [localIsLoading, setLocalIsLoading] = useState(false);
+  const [localError, setLocalError] = useState("");
   const [roomNameError, setRoomNameError] = useState(false);
   const [playerNameError, setPlayerNameError] = useState(false);
 
-  const validateInputs = () => {
+  const localValidateInputs = () => {
     let isValid = true;
 
     if (!roomName.trim()) {
@@ -39,43 +39,43 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
     }
 
     if (!isValid) {
-      setError("ルーム名とプレイヤー名は必須です");
+      setLocalError("ルーム名とプレイヤー名は必須です");
     } else {
-      setError("");
+      setLocalError("");
     }
 
     return isValid;
   };
 
   const handleJoinRoom = async () => {
-    if (!validateInputs()) return;
+    if (!localValidateInputs()) return;
 
-    setIsLoading(true);
-    setError("");
+    setLocalIsLoading(true);
+    setLocalError("");
     try {
       await onJoinRoom({ roomName: roomName.trim(), playerName: playerName.trim() });
       setRoomName("");
       setPlayerName("");
     } catch (err) {
-      setError("ルーム参加に失敗しました");
+      setLocalError("ルーム参加に失敗しました");
     } finally {
-      setIsLoading(false);
+      setLocalIsLoading(false);
     }
   };
 
   const handleCreateRoom = async () => {
-    if (!validateInputs()) return;
+    if (!localValidateInputs()) return;
 
-    setIsLoading(true);
-    setError("");
+    setLocalIsLoading(true);
+    setLocalError("");
     try {
       await onCreateRoom({ roomName: roomName.trim(), playerName: playerName.trim() });
       setRoomName("");
       setPlayerName("");
     } catch (err) {
-      setError("ルーム作成に失敗しました");
+      setLocalError("ルーム作成に失敗しました");
     } finally {
-      setIsLoading(false);
+      setLocalIsLoading(false);
     }
   };
 
@@ -84,7 +84,7 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
     if (e.target.value.trim()) {
       setRoomNameError(false);
     }
-    if (error) setError("");
+    if (localError) setLocalError("");
   };
 
   const handlePlayerNameChange = (e) => {
@@ -92,7 +92,7 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
     if (e.target.value.trim()) {
       setPlayerNameError(false);
     }
-    if (error) setError("");
+    if (localError) setLocalError("");
   };
 
   useEffect(() => {
@@ -118,11 +118,11 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
         </DialogHeader>
 
         <div className="flex flex-col gap-5 py-4">
-          {error && (
+          {localError && (
             <Alert variant="destructive" className="animate-shake">
               <AlertDescription className="flex items-center gap-2">
                 <X className="h-4 w-4" />
-                {error}
+                {localError}
               </AlertDescription>
             </Alert>
           )}
@@ -139,7 +139,7 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
                 value={roomName}
                 onChange={handleRoomNameChange}
                 className={`pr-8 ${roomNameError ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                disabled={isLoading}
+                disabled={localIsLoading}
               />
               {roomName && !roomNameError && <Check className="absolute right-3 top-2.5 h-4 w-4 text-green-500" />}
               {roomNameError && <X className="absolute right-3 top-2.5 h-4 w-4 text-red-500" />}
@@ -159,7 +159,7 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
                 value={playerName}
                 onChange={handlePlayerNameChange}
                 className={`pr-8 ${playerNameError ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                disabled={isLoading}
+                disabled={localIsLoading}
               />
               {playerName && !playerNameError && <Check className="absolute right-3 top-2.5 h-4 w-4 text-green-500" />}
               {playerNameError && <X className="absolute right-3 top-2.5 h-4 w-4 text-red-500" />}
@@ -172,10 +172,10 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
           <Button 
             variant="outline" 
             onClick={handleJoinRoom} 
-            disabled={isLoading} 
+            disabled={localIsLoading} 
             className="h-11 bg-gray-800 hover:bg-gray-700 text-white border-gray-700"
           >
-            {isLoading ? (
+            {localIsLoading ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 参加中...
@@ -187,10 +187,10 @@ export default function RoomJoinModal({ isOpen, isInRoom, onCreateRoom, onJoinRo
 
           <Button 
             onClick={handleCreateRoom} 
-            disabled={isLoading} 
+            disabled={localIsLoading} 
             className="h-11 bg-gray-800 hover:bg-gray-700 text-white border-gray-700"
           >
-            {isLoading ? (
+            {localIsLoading ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 作成中...

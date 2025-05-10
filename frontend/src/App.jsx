@@ -199,6 +199,7 @@ const App = () => {
         onJoinRoom={handleJoinRoom}
         error={error}
         isLoading={isLoading}
+        validateInputs={validateInputs}
       />
 
       {isInRoom && (
