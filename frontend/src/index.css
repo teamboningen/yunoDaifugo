@@ -14,7 +14,7 @@
 }
 
 .animate-card-loading {
-  animation: card-loading 1s infinite ease-in-out;
+  animation: card-loading 0.5s infinite ease-in-out;
 }
 
 .animate-card-success {

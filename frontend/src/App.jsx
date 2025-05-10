@@ -181,7 +181,10 @@ const App = () => {
       if (deckSize > 0 && !isGameOver) {
         console.log("🃏 Emitting drawCard...");
         socket.emit('drawCard');
-        socket.once('gameUpdated', () => resolve());
+        const handler = () => resolve();
+        socket.once('gameUpdated', handler);
+        // エラー時のクリーンアップ
+        return () => socket.off('gameUpdated', handler);
       }
     });
   };
