@@ -156,7 +156,13 @@ io.on('connection', (socket) => {
   });
 
   // ルーム離脱イベントハンドラー
-  socket.on('leaveRoom', async (roomName) => {
+  socket.on('leaveRoom', async () => {
+    const roomName = socket.data.roomName;
+    if (!roomName) {
+      console.log(`🔌 leaveRoom received from ${socket.id}, but no room name found in socket.data`);
+      return;
+    }
+    
     console.log(`🔌 leaveRoom received from ${socket.id}: room=${roomName}`);
 
     const gameState = await loadGameFromFirestore(roomName);
