@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card'
 import CardBackSVG from './CardBackSVG'
 import { cn } from '@/lib/utils'
 
-const CardWrapper = ({ transform = '', isCenter = false, isDrawable, isDrawing, showSuccess }) => (
+const CardWrapper = ({ transform = '', isCenter = false, isDrawable = false, isDrawing = false, showSuccess = false }) => (
   <div className={cn("absolute w-16 h-24", transform)}>
     <Card
       className={cn(
@@ -30,10 +30,12 @@ const CardDeck = ({ drawCard, isDrawable, isGameOver }) => {
 
     try {
       await drawCard();
+      const successTimeout = setTimeout(() => setShowSuccess(false), 500);
       setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 500);
+      return () => clearTimeout(successTimeout);
     } finally {
-      setTimeout(() => setIsDrawing(false), 500);
+      const drawingTimeout = setTimeout(() => setIsDrawing(false), 500);
+      return () => clearTimeout(drawingTimeout);
     }
   };
 
