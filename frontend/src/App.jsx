@@ -217,32 +217,36 @@ const App = () => {
       />
 
       {isInRoom && (
-        <div className="flex justify-end p-4">
-          <Button onClick={handleLeaveRoom} variant="outline">ルーム退出</Button>
+        <div className="flex justify-end p-1 sm:p-2 md:p-4">
+          <Button onClick={handleLeaveRoom} variant="outline" size="sm" className="text-xs sm:text-sm">ルーム退出</Button>
         </div>
       )}
 
       {isFull ? (
-        <div className="full-message">
+        <div className="full-message text-sm sm:text-base p-2 sm:p-4">
           ⚠️ ゲームは満員です。他のプレイヤーが退出するのをお待ちください。
-          <button onClick={() => window.location.reload()} className="retry-button">
+          <button onClick={() => window.location.reload()} className="retry-button text-xs sm:text-sm mt-2">
             再試行
           </button>
         </div>
       ) : (
-        <main className="flex flex-col flex-grow justify-between items-stretch w-full overflow-hidden" style={{ backgroundColor: '#1a472a' }}>
-          {otherPlayers.map((player) => (
-            <OpponentView
-              key={player.seatIndex}
-              playerName={player.name}
-              handSize={player.handSize ?? 0}
-            />
-          ))}
+        <main className="flex flex-col flex-1 justify-between items-stretch w-full overflow-hidden" style={{ backgroundColor: '#1a472a' }}>
+          <div className="flex-none">
+            {otherPlayers.map((player) => (
+              <OpponentView
+                key={player.seatIndex}
+                playerName={player.name}
+                handSize={player.handSize ?? 0}
+              />
+            ))}
+          </div>
 
-          <CardDeck drawCard={drawCard} isGameOver={isGameOver} isDrawable={isDrawable} />
+          <div className="flex-1 flex items-center justify-center min-h-0">
+            <CardDeck drawCard={drawCard} isGameOver={isGameOver} isDrawable={isDrawable} />
+          </div>
 
           {selfPlayer && (
-            <footer className="w-full">
+            <footer className="w-full flex-none">
               <PlayerView
                 key={selfPlayer.seatIndex}
                 playerName={selfPlayer.name || 'あなた'}

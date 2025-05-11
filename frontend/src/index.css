@@ -76,12 +76,54 @@ body {
   overflow: hidden;
   position: fixed;
   inset: 0;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
 }
 
 #root {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* スマートフォン向けの小さい画面用サイズ調整 */
+@media (max-height: 640px) {
+  .h-24 {
+    height: 4.5rem !important;
+  }
+  .h-[135px] {
+    height: 90px !important;
+  }
+  .p-6 {
+    padding: 1rem !important;
+  }
+  .gap-2 {
+    gap: 0.25rem !important;
+  }
+  .text-sm {
+    font-size: 0.75rem !important;
+  }
+}
+
+/* より小さい画面向け */
+@media (max-height: 480px) {
+  .h-24 {
+    height: 3.5rem !important;
+  }
+  .h-[135px] {
+    height: 70px !important;
+  }
+  .p-4 {
+    padding: 0.5rem !important;
+  }
+  .p-6 {
+    padding: 0.75rem !important;
+  }
+  .mb-2 {
+    margin-bottom: 0.25rem !important;
+  }
 }
 
 h1 {
