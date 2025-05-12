@@ -64,19 +64,21 @@ const CardDeck = ({ drawCard, isDrawable, isGameOver }) => {
   if (isGameOver) return null;
 
   return (
-    <div className="flex justify-center items-center my-2 md:my-4">
-      <button
-        onClick={handleDrawCard}
-        disabled={!isDrawable || isDrawing}
-        className={cn(
-          "relative w-[60px] h-[90px] sm:w-16 sm:h-24 md:w-20 md:h-28",
-          !isDrawable && "opacity-50 cursor-not-allowed"
-        )}
-      >
-        <CardWrapper transform="-translate-x-0.5 top-0 transform rotate-2" isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
-        <CardWrapper transform="translate-x-0.5 top-0 transform -rotate-2" isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
-        <CardWrapper transform="top-0" isCenter isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
-      </button>
+    <div className="flex flex-col justify-center items-center gap-2 sm:gap-4 p-1 sm:p-2 md:p-4">
+      <div className="relative w-[80px] sm:w-[100px] md:w-[130px]">
+        <button
+          onClick={handleDrawCard}
+          disabled={!isDrawable || isDrawing}
+          className={cn(
+            "relative w-[60px] h-[90px] sm:w-16 sm:h-24 md:w-20 md:h-28",
+            !isDrawable && "opacity-50 cursor-not-allowed"
+          )}
+        >
+          <CardWrapper transform="-translate-x-0.5 top-0 transform rotate-2" isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
+          <CardWrapper transform="translate-x-0.5 top-0 transform -rotate-2" isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
+          <CardWrapper transform="top-0" isCenter isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
+        </button>
+      </div>
     </div>
   )
 }
