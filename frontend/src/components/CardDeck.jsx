@@ -4,10 +4,10 @@ import { Card } from '@/components/ui/card';
 import CardBackSVG from './CardBackSVG';
 
 const CardWrapper = ({ transform = '', isCenter = false, isDrawable = false, isDrawing = false, showSuccess = false }) => (
-  <div className={cn("absolute w-full h-full", transform)}>
+  <div className={cn("absolute inset-0", transform)}>
     <Card
       className={cn(
-        isCenter ? "w-full h-full" : "w-full h-full",
+        "w-full h-full",
         "p-0 overflow-hidden border-2 transition-all duration-300",
         isDrawable ? "border-blue-300" : "border-gray-400",
         !isDrawable && "opacity-50",
@@ -42,8 +42,8 @@ const CardDeck = ({ drawCard, isDrawable, isGameOver }) => {
   if (isGameOver) return null;
 
   return (
-    <div className="flex flex-col justify-center items-center gap-2 sm:gap-4 p-1 sm:p-2 md:p-4">
-      <div className="relative w-[70px] sm:w-[90px] md:w-[110px]">
+    <div className="flex flex-col justify-center items-center p-1 sm:p-2 md:p-4">
+      <div className="relative">
         <button
           onClick={handleDrawCard}
           disabled={!isDrawable || isDrawing}
