@@ -43,12 +43,12 @@ const CardDeck = ({ drawCard, isDrawable, isGameOver }) => {
 
   return (
     <div className="flex flex-col justify-center items-center gap-2 sm:gap-4 p-1 sm:p-2 md:p-4">
-      <div className="relative w-[80px] sm:w-[100px] md:w-[130px]">
+      <div className="relative w-[70px] sm:w-[90px] md:w-[110px]">
         <button
           onClick={handleDrawCard}
           disabled={!isDrawable || isDrawing}
           className={cn(
-            "relative w-[60px] h-[90px] sm:w-16 sm:h-24 md:w-20 md:h-28",
+            "relative w-[50px] h-[75px] sm:w-[60px] sm:h-[90px] md:w-[70px] md:h-[105px]",
             !isDrawable && "opacity-50 cursor-not-allowed"
           )}
         >

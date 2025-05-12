@@ -19,11 +19,11 @@ const PlayerView = ({ cards = [], playerName }) => {
           return (
             <Card
               key={index}
-              className="min-w-[64px] h-24 rounded-lg shadow-md border border-gray-400 bg-white flex flex-col justify-between px-2 py-2 text-sm"
+              className="min-w-[50px] sm:min-w-[60px] md:min-w-[64px] h-20 sm:h-22 md:h-24 rounded-lg shadow-md border border-gray-400 bg-white flex flex-col justify-between px-1 sm:px-2 py-1 sm:py-2 text-xs sm:text-sm"
               style={{ color: isRed ? 'red' : 'black' }}
             >
               <div className="text-left">{card.rank}</div>
-              <div className="text-center text-3xl">{suitSymbol}</div>
+              <div className="text-center text-xl sm:text-2xl md:text-3xl">{suitSymbol}</div>
               <div className="text-right rotate-180">{card.rank}</div>
             </Card>
           );
