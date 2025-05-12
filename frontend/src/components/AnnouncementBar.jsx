@@ -1,13 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Bell, User } from 'lucide-react'
-
-function formatTime(timestamp) {
-  const date = new Date(timestamp)
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-}
-
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { User, Bell } from 'lucide-react';
 
@@ -17,14 +8,14 @@ const formatTime = (isoString) => {
 };
 
 const AnnouncementBar = ({ fixedMessage, messages }) => {
-  const containerRef = useRef(null)
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    const el = containerRef.current
+    const el = containerRef.current;
     if (el) {
-      el.scrollTop = 0 // 常に最上部を表示
+      el.scrollTop = 0; // 常に最上部を表示
     }
-  }, [messages])
+  }, [messages]);
 
   return (
     <div className="flex flex-col gap-1 sm:gap-2 p-1 sm:p-2">
@@ -61,13 +52,4 @@ const AnnouncementBar = ({ fixedMessage, messages }) => {
   );
 };
 
-export default AnnouncementBar;ert>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  )
-}
-
-export default AnnouncementBar
+export default AnnouncementBar;
