@@ -1,26 +1,4 @@
 import React, { useState } from 'react';
-import { Card } from '@/components/ui/card'
-import CardBackSVG from './CardBackSVG'
-import { cn } from '@/lib/utils'
-
-const CardWrapper = ({ transform = '', isCenter = false, isDrawable = false, isDrawing = false, showSuccess = false }) => (
-  <div className={cn("absolute w-16 h-24", transform)}>
-    <Card
-      className={cn(
-        isCenter ? "w-16 h-24" : "w-full h-full",
-        "p-0 overflow-hidden border-2 transition-all duration-300",
-        isDrawable ? "border-blue-300" : "border-gray-400",
-        !isDrawable && "opacity-50",
-        isDrawing && "animate-card-loading",
-        showSuccess && "animate-card-success"
-      )}
-    >
-      <CardBackSVG />
-    </Card>
-  </div>
-)
-
-import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import CardBackSVG from './CardBackSVG';
