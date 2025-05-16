@@ -203,7 +203,7 @@ const App = () => {
   const otherPlayers = players.filter((p) => !('hand' in p)).sort((a, b) => a.seatIndex - b.seatIndex);
 
   return (
-    <div className="flex flex-col h-full max-h-full overflow-hidden" style={{ backgroundColor: '#1a472a' }}>
+    <div className="flex flex-col h-full min-h-full max-h-full overflow-hidden" style={{ backgroundColor: '#1a472a' }}>
       <AnnouncementBar fixedMessage={fixedMessage} messages={announcements} />
 
       <RoomJoinModal 
@@ -230,7 +230,7 @@ const App = () => {
           </button>
         </div>
       ) : (
-        <main className="flex flex-col flex-1 justify-between items-stretch w-full overflow-hidden" style={{ backgroundColor: '#1a472a' }}>
+        <main className="flex flex-col flex-1 justify-between items-stretch w-full h-full overflow-hidden" style={{ backgroundColor: '#1a472a' }}>
           <div className="flex-none">
             {otherPlayers.map((player) => (
               <OpponentView
