@@ -5,7 +5,7 @@ import CardBackSVG from './CardBackSVG'
 
 const OpponentView = ({ playerName, handSize = 0 }) => {
   return (
-    <div className="mb-4">
+    <div className="mb-4 mx-[env(safe-area-inset-left)] mx-[env(safe-area-inset-right)]">
       <div className="flex justify-center items-center">
         <p className="text-white mb-1 text-sm">{playerName}の手札: {handSize}枚</p>
       </div>
