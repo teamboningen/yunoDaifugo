@@ -203,7 +203,7 @@ const App = () => {
   const otherPlayers = players.filter((p) => !('hand' in p)).sort((a, b) => a.seatIndex - b.seatIndex);
 
   return (
-    <div className="flex flex-col h-screen min-h-screen w-full overflow-hidden" style={{ backgroundColor: '#1a472a' }}>
+    <div className="flex flex-col h-screen min-h-screen w-full overflow-hidden" style={{ backgroundColor: '#1a472a', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
       <AnnouncementBar fixedMessage={fixedMessage} messages={announcements} />
 
       <RoomJoinModal 

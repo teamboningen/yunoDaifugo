@@ -18,7 +18,7 @@ const AnnouncementBar = ({ fixedMessage, messages }) => {
   }, [messages]);
 
   return (
-    <div className="flex flex-col gap-1 sm:gap-2 p-1 sm:p-2">
+    <div className="flex flex-col gap-1 sm:gap-2 p-1 sm:p-2 pt-[calc(env(safe-area-inset-top)+0.25rem)]">
       {/* 固定メッセージ（変わらず上部に表示） */}
       <Alert className="bg-white shadow text-gray-800 font-medium text-xs sm:text-sm py-1 sm:py-2">
         <User className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
