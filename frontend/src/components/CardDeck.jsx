@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import CardBackSVG from './CardBackSVG';
@@ -20,9 +20,15 @@ const CardWrapper = ({ transform = '', isCenter = false, isDrawable = false, isD
   </div>
 )
 
-const CardDeck = ({ drawCard, isDrawable, isGameOver }) => {
+const CardDeck = ({ drawCard, isGameOver, isDrawable }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isChromeDevice, setIsChromeDevice] = useState(false);
+
+  useEffect(() => {
+    // マウント時にChrome検出
+    setIsChromeDevice(isChromeOnMobile());
+  }, []);
 
   const handleDrawCard = async () => {
     if (!isDrawable || isDrawing) return;
@@ -42,23 +48,31 @@ const CardDeck = ({ drawCard, isDrawable, isGameOver }) => {
   if (isGameOver) return null;
 
   return (
-    <div className="flex flex-col justify-center items-center p-1 sm:p-2 md:p-4">
-      <div className="relative">
-        <button
-          onClick={handleDrawCard}
-          disabled={!isDrawable || isDrawing}
-          className={cn(
-            "relative w-[50px] h-[75px] sm:w-[60px] sm:h-[90px] md:w-[70px] md:h-[105px]",
-            !isDrawable && "opacity-50 cursor-not-allowed"
-          )}
-        >
-          <CardWrapper transform="-translate-x-0.5 top-0 transform rotate-2" isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
-          <CardWrapper transform="translate-x-0.5 top-0 transform -rotate-2" isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
-          <CardWrapper transform="top-0" isCenter isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
-        </button>
+    <div className={cn(
+      "w-full max-w-xs p-2 mx-auto relative",
+      isChromeDevice ? "chrome-safe-area" : ""
+    )}>
+      <div 
+        className={cn(
+          "h-[135px] w-[90px] mx-auto cursor-pointer relative transition-all duration-300",
+          !isDrawable && !isGameOver && "opacity-50",
+          isChromeDevice && "transform-gpu"
+        )}
+        onClick={isDrawable && !isGameOver ? handleDrawCard : undefined}
+      >
+        <CardWrapper transform="-translate-x-0.5 top-0 transform rotate-2" isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
+        <CardWrapper transform="translate-x-0.5 top-0 transform -rotate-2" isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
+        <CardWrapper transform="top-0" isCenter isDrawable={isDrawable} isDrawing={isDrawing} showSuccess={showSuccess} />
       </div>
     </div>
   )
 }
 
 export default CardDeck
+
+function isChromeOnMobile() {
+  const userAgent = navigator.userAgent;
+  // Chrome for Android の userAgent を確認
+  const isChrome = /Chrome/.test(userAgent) && /Android/.test(userAgent);
+  return isChrome;
+}

@@ -96,7 +96,7 @@ body {
   flex-direction: column;
 }
 
-/* モバイル向けサイズ調整 - safariのUI考慮 */
+/* モバイル向けサイズ調整 - safari/chromeのUI考慮 */
 @supports (-webkit-touch-callout: none) {
   html {
     height: -webkit-fill-available;
@@ -104,6 +104,14 @@ body {
   body, #root {
     min-height: -webkit-fill-available;
     height: -webkit-fill-available;
+  }
+}
+
+/* Chrome固有の調整 */
+@supports (not (-webkit-touch-callout: none)) and (display: grid) {
+  html, body, #root {
+    height: 100%;
+    min-height: 100%;
   }
 }
 
@@ -143,6 +151,18 @@ body {
   .mb-2 {
     margin-bottom: 0.25rem !important;
   }
+}
+
+/* Chrome特有の調整クラス */
+.chrome-safe-area {
+  margin-top: env(safe-area-inset-top, 0);
+  margin-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.transform-gpu {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 h1 {
