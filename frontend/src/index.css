@@ -100,10 +100,18 @@ body {
 @supports (-webkit-touch-callout: none) {
   html {
     height: -webkit-fill-available;
+    min-height: -webkit-fill-available;
   }
   body, #root {
     min-height: -webkit-fill-available;
     height: -webkit-fill-available;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 }
 

@@ -73,6 +73,6 @@ export default CardDeck
 function isChromeOnMobile() {
   const userAgent = navigator.userAgent;
   // Chrome for Android の userAgent を確認
-  const isChrome = /Chrome/.test(userAgent) && /Android/.test(userAgent);
+  const isChrome = /Chrome/.test(userAgent) && /Android/.test(userAgent);t);
   return isChrome;
 }
