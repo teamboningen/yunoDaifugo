@@ -235,7 +235,7 @@ const App = () => {
           </button>
         </div>
       ) : (
-        <main className="flex flex-col flex-1 justify-between items-stretch w-full h-full overflow-hidden" style={{ backgroundColor: '#1a472a' }}>
+        <main className="flex flex-col flex-1 justify-between items-stretch w-full overflow-y-auto pb-safe" style={{ backgroundColor: '#1a472a' }}>
           <div className="flex-none">
             {otherPlayers.map((player) => (
               <OpponentView

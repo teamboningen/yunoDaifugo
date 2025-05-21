@@ -49,7 +49,7 @@ const CardDeck = ({ drawCard, isGameOver, isDrawable }) => {
 
   return (
     <div className={cn(
-      "w-full max-w-xs p-2 mx-auto relative",
+      "w-full max-w-xs p-2 mx-auto relative my-4",
       isChromeDevice ? "chrome-safe-area" : ""
     )}>
       <div 
