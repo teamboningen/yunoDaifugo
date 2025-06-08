@@ -21,8 +21,10 @@ const AnnouncementBar = ({ fixedMessage, messages }) => {
     <div className="flex flex-col gap-1 sm:gap-2 p-1 sm:p-2 pt-[calc(env(safe-area-inset-top)+0.25rem)]">
       {/* 固定メッセージ（変わらず上部に表示） */}
       <Alert className="bg-white shadow text-gray-800 font-medium text-xs sm:text-sm py-1 sm:py-2">
-        <User className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-        <AlertDescription>{fixedMessage}</AlertDescription>
+        <div className="flex items-center gap-2">
+          <User className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+          <AlertDescription className="flex-1">{fixedMessage}</AlertDescription>
+        </div>
       </Alert>
 
       {/* アナウンス表示（縦スクロール、2.5件分、初期状態で最新が見える） */}
