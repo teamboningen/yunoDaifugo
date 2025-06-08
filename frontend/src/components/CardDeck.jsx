@@ -54,7 +54,7 @@ const CardDeck = ({ drawCard, isGameOver, isDrawable }) => {
     )}>
       <div 
         className={cn(
-          "h-[135px] w-[90px] mx-auto cursor-pointer relative transition-all duration-300",
+          "h-20 sm:h-22 md:h-24 w-12 sm:w-14 md:w-16 mx-auto cursor-pointer relative transition-all duration-300",
           !isDrawable && !isGameOver && "opacity-50",
           isChromeDevice && "transform-gpu"
         )}
