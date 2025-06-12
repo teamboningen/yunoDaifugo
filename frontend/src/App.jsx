@@ -252,7 +252,7 @@ const App = () => {
             ))}
           </div>
 
-          <div className="flex-1 flex items-center justify-center min-h-0 rounded-lg mx-2 my-2 bg-green-800/20 p-4">
+          <div className="flex-1 flex items-center justify-center min-h-0 mx-2 my-2 bg-green-800/20 p-4">
             <CardDeck drawCard={drawCard} isGameOver={isGameOver} isDrawable={isDrawable} />
           </div>
         </main>
