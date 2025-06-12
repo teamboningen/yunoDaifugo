@@ -256,15 +256,15 @@ const App = () => {
             <CardDeck drawCard={drawCard} isGameOver={isGameOver} isDrawable={isDrawable} />
           </div>
         </main>
+      )}
 
-        {/* 手札を固定表示 */}
-        {selfPlayer && (
-          <PlayerView
-            key={selfPlayer.seatIndex}
-            playerName={selfPlayer.name || 'あなた'}
-            cards={selfPlayer.hand}
-          />
-        )}
+      {/* 手札を固定表示 */}
+      {selfPlayer && (
+        <PlayerView
+          key={selfPlayer.seatIndex}
+          playerName={selfPlayer.name || 'あなた'}
+          cards={selfPlayer.hand}
+        />
       )}
 
       <GameControls resetGame={handleResetGame} isResetting={isResetting} isGameOver={isGameOver} />
