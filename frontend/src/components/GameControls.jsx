@@ -1,7 +1,11 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 
-const GameControls = ({ resetGame, isResetting }) => {
+const GameControls = ({ resetGame, isResetting, isGameOver }) => {
+  if (!isGameOver) {
+    return null;
+  }
+
   return (
     <div className="p-2 flex justify-center sticky bottom-0" style={{
       paddingBottom: `calc(0.5rem + env(safe-area-inset-bottom, 0px))`,

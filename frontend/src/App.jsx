@@ -35,7 +35,7 @@ const App = () => {
   const handleCreateRoom = ({ roomName: newRoomName, playerName: newPlayerName }) => {
     return new Promise((resolve, reject) => {
       socket.emit('createRoom', { roomName: newRoomName, playerName: newPlayerName });
-      
+
       const timeoutId = setTimeout(() => {
         reject(new Error('タイムアウトしました'));
       }, 5000);
@@ -58,7 +58,7 @@ const App = () => {
   const handleJoinRoom = ({ roomName: newRoomName, playerName: newPlayerName }) => {
     return new Promise((resolve, reject) => {
       socket.emit('joinRoom', { roomName: newRoomName, playerName: newPlayerName });
-      
+
       const timeoutId = setTimeout(() => {
         reject(new Error('タイムアウトしました'));
       }, 5000);
@@ -146,7 +146,7 @@ const App = () => {
       setError(message);
       setIsLoading(false);
       addAnnouncement({ message: `エラー: ${message}`, time: new Date().toISOString() });
-      
+
       // ルーム情報関連のエラーの場合、ルーム状態をリセット
       if (message.includes('ルーム情報') || message.includes('ルームが見つかり')) {
         setIsInRoom(false);
@@ -201,6 +201,12 @@ const App = () => {
   const isDrawable = getSelfPlayer()?.seatIndex === currentTurn;
   console.log('isDrawable:', isDrawable);
   const otherPlayers = players.filter((p) => !('hand' in p)).sort((a, b) => a.seatIndex - b.seatIndex);
+
+  const handleResetGame = () => {
+      socket.emit('resetGame');
+  };
+
+  const [isResetting, setIsResetting] = useState(false);
 
   return (
     <div className="flex flex-col h-screen min-h-screen w-full overflow-hidden" 
@@ -262,7 +268,7 @@ const App = () => {
         </main>
       )}
 
-      <GameControls resetGame={() => socket.emit('resetGame')} />
+      <GameControls resetGame={handleResetGame} isResetting={isResetting} isGameOver={isGameOver} />
     </div>
   );
 };
