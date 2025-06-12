@@ -11,8 +11,8 @@ const suitMap = {
 
 const PlayerView = ({ cards = [], playerName }) => {
   return (
-    <div className="my-4 px-4 mx-[env(safe-area-inset-left)] mx-[env(safe-area-inset-right)]">
-      <h2 className="text-lg font-semibold mb-2">{playerName}の手札: {cards.length}枚</h2>
+    <div className="fixed bottom-0 left-0 right-0 bg-green-800/40 border-t border-green-200/50 rounded-t-lg mx-2 mb-2 p-4" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      <h2 className="text-lg font-semibold mb-2 text-white">{playerName}の手札: {cards.length}枚</h2>
       <ScrollArea className="w-full" orientation="horizontal">
         <div className="flex space-x-2 pb-2 pr-4">
           {Array.isArray(cards) && cards.map((card, index) => {
