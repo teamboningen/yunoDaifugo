@@ -241,7 +241,7 @@ const App = () => {
           </button>
         </div>
       ) : (
-        <main className="flex flex-col flex-1 justify-between items-stretch w-full overflow-y-auto pb-safe" style={{ backgroundColor: '#1a472a' }}>
+        <main className="flex flex-col flex-1 justify-between items-stretch w-full overflow-y-auto" style={{ backgroundColor: '#1a472a', paddingBottom: '140px' }}>
           <div className="flex-none">
             {otherPlayers.map((player) => (
               <OpponentView
@@ -252,20 +252,19 @@ const App = () => {
             ))}
           </div>
 
-          <div className="flex-1 flex items-center justify-center min-h-0">
+          <div className="flex-1 flex items-center justify-center min-h-0 rounded-lg mx-2 my-2 bg-green-800/20 border border-green-200/30 p-4">
             <CardDeck drawCard={drawCard} isGameOver={isGameOver} isDrawable={isDrawable} />
           </div>
-
-          {selfPlayer && (
-            <footer className="w-full flex-none">
-              <PlayerView
-                key={selfPlayer.seatIndex}
-                playerName={selfPlayer.name || 'あなた'}
-                cards={selfPlayer.hand}
-              />
-            </footer>
-          )}
         </main>
+
+        {/* 手札を固定表示 */}
+        {selfPlayer && (
+          <PlayerView
+            key={selfPlayer.seatIndex}
+            playerName={selfPlayer.name || 'あなた'}
+            cards={selfPlayer.hand}
+          />
+        )}
       )}
 
       <GameControls resetGame={handleResetGame} isResetting={isResetting} isGameOver={isGameOver} />
