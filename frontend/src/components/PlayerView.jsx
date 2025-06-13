@@ -19,6 +19,9 @@ const PlayerView = ({ cards = [], playerName }) => {
             const isRed = card.suit === 'Hearts' || card.suit === 'Diamonds';
             const suitSymbol = suitMap[card.suit] || card.suit;
             const displayRank = card.rank.charAt(0);
+            const isNumberCard = !['Jack', 'Queen', 'King', 'Ace'].includes(card.rank);
+            const suitCount = isNumberCard ? parseInt(card.rank, 10) : 1;
+            
             return (
               <Card
                 key={index}
@@ -26,7 +29,22 @@ const PlayerView = ({ cards = [], playerName }) => {
                 style={{ color: isRed ? 'red' : 'black' }}
               >
                 <div className="text-right">{displayRank}</div>
-                <div className="text-center text-xl sm:text-2xl md:text-3xl">{suitSymbol}</div>
+                <div className="flex-1 flex flex-col items-center justify-center">
+                  {isNumberCard ? (
+                    <div className="grid gap-0.5" style={{
+                      gridTemplateColumns: suitCount <= 2 ? '1fr' : suitCount <= 4 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+                      gridTemplateRows: suitCount <= 4 ? `repeat(${Math.ceil(suitCount / 2)}, 1fr)` : 'repeat(4, 1fr)'
+                    }}>
+                      {Array.from({ length: suitCount }).map((_, i) => (
+                        <div key={i} className="text-center text-xs sm:text-sm">
+                          {suitSymbol}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center text-xl sm:text-2xl md:text-3xl">{suitSymbol}</div>
+                  )}
+                </div>
                 <div className="text-right rotate-180">{displayRank}</div>
               </Card>
             );
