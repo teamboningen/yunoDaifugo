@@ -25,15 +25,15 @@ const PlayerView = ({ cards = [], playerName }) => {
             return (
               <Card
                 key={index}
-                className="min-w-[70px] sm:min-w-[80px] md:min-w-[90px] h-28 sm:h-32 md:h-36 rounded-lg shadow-md border border-gray-400 bg-white flex flex-col justify-between px-1 sm:px-2 py-1 sm:py-2 text-xs sm:text-sm flex-shrink-0"
+                className="min-w-[50px] sm:min-w-[60px] md:min-w-[64px] h-20 sm:h-22 md:h-24 rounded-lg shadow-md border border-gray-400 bg-white flex flex-col justify-between px-1 sm:px-2 py-1 sm:py-2 text-xs sm:text-sm flex-shrink-0"
                 style={{ color: isRed ? 'red' : 'black' }}
               >
                 <div className="text-right">{displayRank}</div>
                 <div className="flex-1 flex flex-col items-center justify-center">
                   {isNumberCard ? (
-                    <div className="grid gap-0.5 h-full items-center" style={{
-                      gridTemplateColumns: suitCount <= 2 ? '1fr' : suitCount <= 4 ? 'repeat(2, 1fr)' : suitCount <= 6 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-                      gridTemplateRows: suitCount <= 2 ? `repeat(${suitCount}, 1fr)` : suitCount <= 4 ? `repeat(${Math.ceil(suitCount / 2)}, 1fr)` : suitCount <= 6 ? 'repeat(3, 1fr)' : 'repeat(4, 1fr)'
+                    <div className="grid gap-0.5" style={{
+                      gridTemplateColumns: suitCount <= 2 ? '1fr' : suitCount <= 4 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+                      gridTemplateRows: suitCount <= 4 ? `repeat(${Math.ceil(suitCount / 2)}, 1fr)` : 'repeat(4, 1fr)'
                     }}>
                       {Array.from({ length: suitCount }).map((_, i) => (
                         <div key={i} className="text-center text-xs sm:text-sm">
