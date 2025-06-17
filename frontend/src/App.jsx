@@ -160,8 +160,7 @@ const App = () => {
       setIsInRoom(true);
       setError('');
       setIsLoading(false);
-      const newRoomName = socket.data?.roomName || roomName;
-      addAnnouncement({ message: `ルーム「${newRoomName}」に参加しました`, time: new Date().toISOString() });
+      addAnnouncement({ message: `ルーム「${roomName}」に参加しました`, time: new Date().toISOString() });
     });
 
     socket.on('roomLeft', () => {
