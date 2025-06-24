@@ -10,7 +10,7 @@ const OpponentView = ({ playerName, handSize = 0 }) => {
         <p className="text-white mb-1 text-sm">{playerName}の手札: {handSize}枚</p>
       </div>
       <div className="flex justify-center">
-        <div className="relative w-12 sm:w-14 md:w-16 h-18 sm:h-20 md:h-24">
+        <div className="relative w-10 sm:w-12 md:w-14 h-16 sm:h-18 md:h-20">
           {Array.from({ length: Math.max(0, handSize) }).map((_, index) => (
             <div
               key={index}
