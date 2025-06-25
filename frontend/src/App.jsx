@@ -136,6 +136,7 @@ const App = () => {
       setCurrentTurn(data.currentTurn);
       setIsGameOver(data.isGameOver);
       setWinner(data.winner || null);
+      setIsResetting(false); // リセット状態をクリア
       if (Array.isArray(data.announcements)) {
         setAnnouncements(prev => [...data.announcements, ...prev].slice(0, 3));
       }
