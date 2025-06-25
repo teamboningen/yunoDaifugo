@@ -44,6 +44,7 @@ const App = () => {
         clearTimeout(timeoutId);
         setRoomName(newRoomName);
         setPlayerName(newPlayerName);
+        addAnnouncement({ message: `ルーム「${newRoomName}」を作成しました`, time: new Date().toISOString() });
         resolve();
       });
 
@@ -67,6 +68,7 @@ const App = () => {
         clearTimeout(timeoutId);
         setRoomName(newRoomName);
         setPlayerName(newPlayerName);
+        addAnnouncement({ message: `ルーム「${newRoomName}」に参加しました`, time: new Date().toISOString() });
         resolve();
       });
 
