@@ -33,25 +33,39 @@ const App = () => {
 
   // ルーム作成ハンドラー
   const handleCreateRoom = ({ roomName: newRoomName, playerName: newPlayerName }) => {
+    console.log('🎮 handleCreateRoom called:', { newRoomName, newPlayerName });
     return new Promise((resolve, reject) => {
       socket.emit('createRoom', { roomName: newRoomName, playerName: newPlayerName });
 
       const timeoutId = setTimeout(() => {
+        console.error('❌ createRoom timeout');
         reject(new Error('タイムアウトしました'));
       }, 5000);
 
-      socket.once('roomJoined', () => {
+      const cleanupHandlers = () => {
+        socket.off('roomJoined', roomJoinedHandler);
+        socket.off('error', errorHandler);
+      };
+
+      const roomJoinedHandler = () => {
+        console.log('✅ roomJoined event received');
         clearTimeout(timeoutId);
+        cleanupHandlers();
         setRoomName(newRoomName);
         setPlayerName(newPlayerName);
         addAnnouncement({ message: `ルーム「${newRoomName}」を作成しました`, time: new Date().toISOString() });
         resolve();
-      });
+      };
 
-      socket.once('error', (error) => {
+      const errorHandler = (error) => {
+        console.error('❌ error event received:', error);
         clearTimeout(timeoutId);
+        cleanupHandlers();
         reject(error);
-      });
+      };
+
+      socket.once('roomJoined', roomJoinedHandler);
+      socket.once('error', errorHandler);
     });
   };
 

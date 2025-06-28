@@ -57,7 +57,8 @@ const RoomJoinModal = ({ isOpen, isInRoom, onCreateRoom, onJoinRoom, error, isLo
       setRoomName("");
       setPlayerName("");
     } catch (err) {
-      setLocalError("ルーム参加に失敗しました");
+      console.error("ルーム参加エラー:", err);
+      setLocalError(`ルーム参加に失敗しました: ${err.message || err}`);
     } finally {
       setLocalIsLoading(false);
     }
@@ -73,7 +74,8 @@ const RoomJoinModal = ({ isOpen, isInRoom, onCreateRoom, onJoinRoom, error, isLo
       setRoomName("");
       setPlayerName("");
     } catch (err) {
-      setLocalError("ルーム作成に失敗しました");
+      console.error("ルーム作成エラー:", err);
+      setLocalError(`ルーム作成に失敗しました: ${err.message || err}`);
     } finally {
       setLocalIsLoading(false);
     }
